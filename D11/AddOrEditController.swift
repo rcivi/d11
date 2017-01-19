@@ -7,89 +7,259 @@
 //
 
 import UIKit
+import CoreData
+import SwiftDate
+
 
 class AddOrEditController: UITableViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+	@IBOutlet var addOrEditTable: UITableView!
+	@IBOutlet weak var addOrSaveButton: UIBarButtonItem!
+	@IBOutlet weak var cancelButton: UIBarButtonItem!
+	@IBOutlet weak var navigationBar: UINavigationItem!
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+	//MARK: - TABLE ELEMENTS
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-    }
+	@IBOutlet weak var titleTextField: UITextField!
+	@IBOutlet weak var allDaySwitch: UISwitch!
+	@IBOutlet weak var dateLabel: UILabel!
+	@IBOutlet weak var datePicker: UIDatePicker!
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
 
-    // MARK: - Table view data source
+	//MARK: -
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
+	var addOrEditEvent: NSManagedObject?
+	var datePickerIsVisible: Bool = false
+	var theResult: Result?
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
-    }
 
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
-        // Configure the cell...
+	//MARK: -
 
-        return cell
-    }
-    */
+	override func viewDidLoad() {
+		super.viewDidLoad()
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
+		// Uncomment the following line to preserve selection between presentations
+		// self.clearsSelectionOnViewWillAppear = false
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
+		// Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+		// self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+		//		 Removes empty lines in the table
+		addOrEditTable.tableFooterView = UIView()
 
-    }
-    */
+		// To dismiss keyboard after a tap outside
+//		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tap(gesture:)))
+//		self.view.addGestureRecognizer(tapGesture)
 
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
+		setupAddTargetIsNotEmptyTextFields()
 
-    /*
-    // MARK: - Navigation
+		var tempDate: Date?
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+		if let ev = addOrEditEvent {
+
+			// EDIT EXISTING EVENT
+
+			print("\(ev.value(forKey: "title") as! String)")
+			navigationBar.title = "Edit Event"
+			addOrSaveButton.title = "Save"
+
+			titleTextField.text = ev.value(forKey: "title") as? String
+			allDaySwitch.setOn(ev.value(forKey: "allday") as! Bool, animated: true)
+
+			if allDaySwitch.isOn { datePicker.datePickerMode = .date } else { datePicker.datePickerMode = .dateAndTime }
+
+			tempDate = ev.value(forKey: "date") as? Date
+
+		} else {
+
+			// ADDIND A NEW EVENT
+
+			print("No event arrived here from AddOrEditController.")
+			navigationBar.title = "New Event"
+			addOrSaveButton.title = "Add"
+
+			titleTextField.text = ""
+			allDaySwitch.setOn(true, animated: true)
+			datePicker.datePickerMode = .date
+
+			tempDate = Date()
+
+		}
+
+		displayDate(date: tempDate!)
+
+	}
+
+	override func didReceiveMemoryWarning() {
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
+
+	// MARK: - Table view data source
+
+	override func numberOfSections(in tableView: UITableView) -> Int {
+
+		return 3
+	}
+
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+
+		switch(section) {
+		case 0:
+			return 1
+		case 1:
+			return 3
+		case 2:
+			return 1
+		default:
+			return 0
+		}
+	}
+
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+		if indexPath.section == 1 && indexPath.row == 1 {
+			datePickerIsVisible = !datePickerIsVisible
+			tableView.beginUpdates()
+			addOrEditTable.reloadData()
+			if datePickerIsVisible { dateLabel.textColor = UIColor.red } else { dateLabel.textColor = UIColor.black }
+			tableView.endUpdates()
+		}
+	}
+
+
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+
+		var heigth: CGFloat = 0.0
+
+		if indexPath.section == 1 && indexPath.row == 2 {
+			if datePickerIsVisible { heigth = 238.0 } else { heigth = 0.0 }
+		} else {
+			heigth = 44.0
+		}
+		return heigth
+	}
+
+
+	func displayDate(date: Date) {
+
+		if allDaySwitch.isOn {
+			// DISPLAY DATE AND TIME
+			dateLabel.text = dateOnlyFormatter.string(from: date)
+			datePicker.datePickerMode = .date
+		} else {
+			// DISPLAY DATE ONLY
+			dateLabel.text = dateAndTimeFormatter.string(from: date)
+			datePicker.datePickerMode = .dateAndTime
+		}
+		datePicker.setDate(date, animated: true)
+	}
+
+
+	@IBAction func allDaySwitchClicked(_ sender: Any) {
+
+		var result = ""
+		guard let dateString = dateLabel.text else { return }
+
+		if allDaySwitch.isOn {
+			if let date = dateAndTimeFormatter.date(from: dateString) {
+				result = dateOnlyFormatter.string(from: date)
+				datePicker.datePickerMode = .date
+			}
+		} else {
+			if let date = dateOnlyFormatter.date(from: dateString) {
+				result = dateAndTimeFormatter.string(from: date)
+				datePicker.datePickerMode = .dateAndTime
+			}
+		}
+
+		dateLabel.text = result
+	}
+
+	@IBAction func datePickerValueChanged(_ sender: Any) {
+
+		let date = datePicker.date
+		displayDate(date: date)
+	}
+
+
+	@IBAction func cancelButtonClicked(_ sender: Any) {
+		debugPrint("Cancel button pressed")
+	}
+
+	@IBAction func addOrSaveButtonClicked(_ sender: Any) {
+		debugPrint("Add or Save button pressed")
+	}
+
+
+	// MARK: - SEGUE Navigation
+
+	    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+	
+			debugPrint("Preparing to return from AddOrEditController to MainController")
+
+			if sender is UIBarButtonItem {
+				debugPrint("Cancel or AddOrSave button pressed")
+
+				let clickedButton = sender as! UIBarButtonItem
+				let buttonTag = clickedButton.tag
+
+				var action: ActionToReturn
+
+				if buttonTag == 1 {
+					action = ActionToReturn.canceled
+				} else {
+					if addOrEditEvent != nil {
+						action = ActionToReturn.edited
+					} else {
+						action = ActionToReturn.added
+					}
+				}
+				
+				theResult = Result(action: action,
+				                   title: titleTextField.text!.trimmingCharacters(in: .whitespaces),
+				                   date: dateLabel.text!,
+				                   allday: allDaySwitch.isOn,
+				                   repeatition: false,
+				                   every: Every.never
+				)
+
+			}
+	     }
+	
+	//MARK: - KEYBOARD
+
+	// Chiude la tastiera quando l'utente clicca fuori dalla tastiera
+	override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+
+		debugPrint("-- touchesBegan")
+		self.view.endEditing(true)
+	}
+
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+
+		titleTextField.resignFirstResponder()
+		return true
+	}
+
+	func tap(gesture: UITapGestureRecognizer) {
+		titleTextField.resignFirstResponder()
+	}
+
+	// Enable and Disable AddOrSaveButton if title is empty or not
+
+	func setupAddTargetIsNotEmptyTextFields() {
+
+		addOrSaveButton.isEnabled = false
+		titleTextField.addTarget(self, action: #selector(textFieldsIsNotEmpty), for: .editingChanged)
+	}
+
+	func textFieldsIsNotEmpty(sender: UITextField) {
+
+		if let str = sender.text?.trimmingCharacters(in: .whitespaces) {
+			self.addOrSaveButton.isEnabled = !str.isEmpty
+		}
+	}
 
 }

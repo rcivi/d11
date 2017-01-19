@@ -28,14 +28,13 @@ class MainController: UITableViewController {
 
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
+	var events = [NSManagedObject]()
 	var dateFormatter: DateFormatter {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "yyyy-MM-dd"
 		return dateFormatter
 	}
 
-
-	var events = [NSManagedObject]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -221,12 +220,50 @@ class MainController: UITableViewController {
 		loc.setValue(rollDate(startDate: date, repeatTime: every), forKey: "rolledDate")
 		loc.setValue(every.rawValue, forKey: "every")
 
+		loc.setValue(true, forKey: "allday")
+		loc.setValue(false, forKey: "repeatition")
+
 		do {
 			try context.save()
 			debugPrint("Record (\(title) - \(dateFormatter.string(from: date)))) Saved")
 		} catch let error {
 			debugPrint("1·\(error)")
 		}
+	}
+
+
+	func saveEventWithStruct(res: Result) {
+
+		var date = Date()
+
+		if res.allday {
+			date = dateOnlyFormatter.date(from: res.date)!
+		} else {
+			date = dateAndTimeFormatter.date(from: res.date)!
+		}
+
+
+		let loc = NSEntityDescription.insertNewObject(forEntityName: "Events", into: context)
+		loc.setValue(res.title, forKey: "title")
+		
+		loc.setValue(date, forKey: "date")
+
+		loc.setValue(rollDate(startDate: date, repeatTime: res.every), forKey: "rolledDate")
+		loc.setValue(res.every.rawValue, forKey: "every")
+
+
+		loc.setValue(true, forKey: "allday")
+		loc.setValue(false, forKey: "repeatition")
+
+		do {
+			try context.save()
+			debugPrint("Record (\(title) - \(dateFormatter.string(from: date)))) Saved")
+		} catch let error {
+			debugPrint("1·\(error)")
+		}
+
+
+
 	}
 
 
@@ -272,7 +309,10 @@ class MainController: UITableViewController {
 		if let title = event.value(forKey: "title") { debugPrint(title, terminator: " - ") }
 		if let date = event.value(forKey: "date") { debugPrint(dateFormatter.string(from: date as! Date), terminator: " - ") }
 		if let rDate = event.value(forKey: "rolledDate") { debugPrint(dateFormatter.string(from: rDate as! Date), terminator: " - ") }
-		if let every = event.value(forKey: "every") { debugPrint("Every: \(Every(rawValue: every as! Int)!)") }
+		if let every = event.value(forKey: "every") { debugPrint("Every: \(Every(rawValue: every as! Int)!)", terminator: " - ") }
+		if let allDay = event.value(forKey: "allday") { debugPrint(allDay, terminator: " - ") }
+		if let rep = event.value(forKey: "repeatition") { debugPrint(rep, terminator: " \n ") }
+
 	}
 
 
@@ -315,30 +355,51 @@ class MainController: UITableViewController {
 
 	// MARK: - SEGUE
 
-	//	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-	//
-	//		if segue.identifier == "addOrEditSegue" {
-	//
-	//			debugPrint("Preparing to leave the main controller")
-	//
-	//			let navigationController = segue.destination as! UINavigationController
-	//			let destinationController = navigationController.topViewController as! AddOrEditController
-	//
-	//			if sender is UITableViewCell {
-	//				let row = (self.tableView.indexPath(for: sender as! UITableViewCell)?.row)!
-	//				destinationController.addOrEditEvent = events[row]
-	//			} else {
-	//				destinationController.addOrEditEvent = nil
-	//			}
-	//
-	//		}
-	//
-	//	}
+		override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 	
-
+			if segue.identifier == "addOrEditSegue" {
+	
+				debugPrint("Preparing to leave the main controller")
+	
+				let navigationController = segue.destination as! UINavigationController
+				let destinationController = navigationController.topViewController as! AddOrEditController
+	
+				if sender is UITableViewCell {
+					let row = (self.tableView.indexPath(for: sender as! UITableViewCell)?.row)!
+					destinationController.addOrEditEvent = events[row]
+				} else {
+					destinationController.addOrEditEvent = nil
+				}
+	
+			}
+	
+		}
 
 	@IBAction func unwindToMainController(segue: UIStoryboardSegue) {
-		
+
+		debugPrint("Returned to MainController")
+
+		let navigationController = segue.source as! AddOrEditController
+
+		guard let res = navigationController.theResult else { return }
+		let actionTaken = res.action
+
+		switch actionTaken {
+
+		case .canceled:
+			debugPrint("User canceled")
+
+		case .added:
+			debugPrint("User added")
+			saveEventWithStruct(res: res)
+			
+		case .edited:
+			debugPrint("User edited")
+		}
+
+		print(res)
+		loadEvents()
+		eventsTable.reloadData()
 	}
 
 }

@@ -9,6 +9,19 @@
 import Foundation
 import SwiftDate
 
+
+var dateOnlyFormatter: DateFormatter {
+	let dateFormatter = DateFormatter()
+	dateFormatter.dateFormat = "d-M-yyyy"
+	return dateFormatter
+}
+
+var dateAndTimeFormatter: DateFormatter {
+	let dateFormatter = DateFormatter()
+	dateFormatter.dateFormat = "d-M-yyyy HH:mm"
+	return dateFormatter
+}
+
 enum Every: Int {
 	case never = 0
 	case day   = 1
@@ -17,17 +30,31 @@ enum Every: Int {
 	case year  = 4
 }
 
+enum ActionToReturn {
+	case canceled
+	case edited
+	case added
+}
 
 
 
-class Event {
+struct Result {
 
+	var action: ActionToReturn
 	var title: String
-	var date: DateInRegion
-
+	var date: String
+	var allday: Bool
+	var repeatition: Bool
+	var every: Every
+//	var rolledDate: Date
 	
-	init(title: String, date: DateInRegion) {
+	
+	init(action: ActionToReturn, title: String, date: String, allday: Bool, repeatition: Bool, every: Every) {
+		self.action = action
 		self.title = title
 		self.date = date
+		self.allday = allday
+		self.repeatition = repeatition
+		self.every = every
 	}
 }
