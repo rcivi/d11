@@ -36,8 +36,6 @@ enum ActionToReturn {
 	case added
 }
 
-
-
 struct Result {
 
 	var action: ActionToReturn

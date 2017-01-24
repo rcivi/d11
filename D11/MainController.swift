@@ -21,14 +21,16 @@ class EventCell: SwipeCell {
 
 
 
-
 class MainController: UITableViewController {
 
 	@IBOutlet var eventsTable: UITableView!
 
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
-	var events = [NSManagedObject]()
+	var events = [Event]()
+	var managedObjectContext: NSManagedObjectContext?
+
+
 	var dateFormatter: DateFormatter {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -39,17 +41,14 @@ class MainController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-
 		// Removes empty lines in the table
 		eventsTable.tableFooterView = UIView()
 
+		let appDelegate = UIApplication.shared.delegate as! AppDelegate
+		managedObjectContext = appDelegate.persistentContainer.viewContext
 
 		createInitialRecords()
+
 		loadEvents()
 		
 
@@ -116,41 +115,6 @@ class MainController: UITableViewController {
 	}
 
 
-	/*
-	// Override to support conditional editing of the table view.
-	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-	// Return false if you do not want the specified item to be editable.
-	return true
-	}
-	*/
-
-	/*
-	// Override to support editing the table view.
-	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-	if editingStyle == .delete {
-	// Delete the row from the data source
-	tableView.deleteRows(at: [indexPath], with: .fade)
-	} else if editingStyle == .insert {
-	// Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-	}
-	}
-	*/
-
-	/*
-	// Override to support rearranging the table view.
-	override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-	}
-	*/
-
-	/*
-	// Override to support conditional rearranging of the table view.
-	override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-	// Return false if you do not want the item to be re-orderable.
-	return true
-	}
-	*/
-
 
 
 	// MARK: - DATE MANAGEMENT
@@ -202,117 +166,78 @@ class MainController: UITableViewController {
 
 		deleteAllEvents()
 
-		saveEvent(title: "Passaporto Ruggero", date: dateFormatter.date(from: "2025-6-23")!, every: Every.never)
-		saveEvent(title: "Patente Ruggero", date: dateFormatter.date(from: "2020-12-13")!, every: Every.never)
-		saveEvent(title: "Compleanno Bianca", date: dateFormatter.date(from: "1996-2-4")!, every: Every.year)
-		saveEvent(title: "Compleanno Clara", date: dateFormatter.date(from: "2017-7-25")!, every: Every.year)
-		saveEvent(title: "Compleanno Pietro", date: dateFormatter.date(from: "1999-1-8")!, every: Every.year)
-		saveEvent(title: "EZ Birthday", date: dateFormatter.date(from: "2010-11-29")!, every: Every.year)
+		let r1 = Result(action: .added, title: "Passaporto Ruggero", date: "23-6-2025", allday: true, repeatition: false, every: .never)
+		let r2 = Result(action: .added, title: "Compleanno Bianca", date: "4-2-1996", allday: true, repeatition: false, every: .year)
+		let r3 = Result(action: .added, title: "Compleanno Clara", date: "25-7-1962", allday: true, repeatition: false, every: .year)
+		let r4 = Result(action: .added, title: "Compleanno Pietro", date: "8-1-1999", allday: true, repeatition: false, every: .year)
+		let r5 = Result(action: .added, title: "EZ Birthday", date: "29-11-2010", allday: true, repeatition: false, every: .year)
+		let r6 = Result(action: .added, title: "Testo molto più lungo di un reminder", date: "17-1-2017", allday: true, repeatition: false, every: .never)
+		let r7 = Result(action: .added, title: "Pippo", date: "12-12-2018", allday: true, repeatition: false, every: Every.never)
 
-		saveEvent(title: "Testo molto più lungo di un reminder", date: dateFormatter.date(from: "2017-1-17")!, every: Every.never)
+
+		saveEventWithStruct(eventToSave: nil, res: r1)
+		saveEventWithStruct(eventToSave: nil, res: r2)
+		saveEventWithStruct(eventToSave: nil, res: r3)
+		saveEventWithStruct(eventToSave: nil, res: r4)
+		saveEventWithStruct(eventToSave: nil, res: r5)
+		saveEventWithStruct(eventToSave: nil, res: r6)
+		saveEventWithStruct(eventToSave: nil, res: r7)
+
 	}
 
-	func saveEvent(title: String, date: Date, every: Every) {
+	func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
-		let loc = NSEntityDescription.insertNewObject(forEntityName: "Events", into: context)
-		loc.setValue(title, forKey: "title")
-		loc.setValue(date, forKey: "date")
-		loc.setValue(rollDate(startDate: date, repeatTime: every), forKey: "rolledDate")
-		loc.setValue(every.rawValue, forKey: "every")
+		let event: Event = eventToSave != nil ? eventToSave! : Event(context: managedObjectContext!)
+		let date: Date =  res.allday ? dateOnlyFormatter.date(from: res.date)! : dateAndTimeFormatter.date(from: res.date)!
 
-		loc.setValue(true, forKey: "allday")
-		loc.setValue(false, forKey: "repeatition")
-
-		do {
-			try context.save()
-			debugPrint("Record (\(title) - \(dateFormatter.string(from: date)))) Saved")
-		} catch let error {
-			debugPrint("1·\(error)")
-		}
-	}
-
-
-	func saveEventWithStruct(res: Result) {
-
-		var date = Date()
-
-		if res.allday {
-			date = dateOnlyFormatter.date(from: res.date)!
-		} else {
-			date = dateAndTimeFormatter.date(from: res.date)!
-		}
-
-
-		let loc = NSEntityDescription.insertNewObject(forEntityName: "Events", into: context)
-		loc.setValue(res.title, forKey: "title")
-		
-		loc.setValue(date, forKey: "date")
-
-		loc.setValue(rollDate(startDate: date, repeatTime: res.every), forKey: "rolledDate")
-		loc.setValue(res.every.rawValue, forKey: "every")
-
-
-		loc.setValue(true, forKey: "allday")
-		loc.setValue(false, forKey: "repeatition")
+		event.title = res.title
+		event.date = date as NSDate
+		event.rolledDate = rollDate(startDate: date, repeatTime: res.every) as NSDate?
+		event.every = Int32(res.every.rawValue)
+		event.allday = true
+		event.repeatition = false
 
 		do {
-			try context.save()
-			debugPrint("Record (\(title) - \(dateFormatter.string(from: date)))) Saved")
-		} catch let error {
-			debugPrint("1·\(error)")
-		}
-
-
+			try managedObjectContext!.save()
+		} catch { fatalError("Error in storing data") }
 
 	}
 
 
 	func deleteAllEvents() {
 
-		let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Events")
-		request.returnsObjectsAsFaults = false
-		let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: request)
+		let request: NSFetchRequest<Event> = Event.fetchRequest()
+		let batchDeleteRequest: NSBatchDeleteRequest
 
 		do {
+			batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
 			try context.execute(batchDeleteRequest)
-		} catch let error {
-			debugPrint(error)
+		} catch {
+			fatalError("Failed removing existing records")
 		}
 	}
 
+
 	func loadEvents() {
 
-		let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Events")
-		request.returnsObjectsAsFaults = false
-
-		events.removeAll()
+		let request: NSFetchRequest<Event> = Event.fetchRequest()
 
 		do {
-			let evs = try context.fetch(request)
-			if evs.count > 0 {
-				for ev in evs as! [NSManagedObject] {
-
-					events.append(ev)
-					displayEvent(event: ev)
-				}
-
-				// SORT BY REVERESE DATE
-				events.sort(by: { (($0.value(forKey: "rolledDate")) as! Date) < (($1.value(forKey: "rolledDate")) as! Date) })
-
-				debugPrint("\(evs.count) records loaded .")
-			} else { debugPrint("No results") }
-		} catch let error { debugPrint("2·\(error)") }
+			let results = try managedObjectContext?.fetch(request)
+			events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
+		} catch {
+			fatalError("Error in retrieving items")
+		}
 	}
 
-	func displayEvent(event: NSManagedObject) {
+	func displayEvent(event: Event) {
 
-		if let title = event.value(forKey: "title") { debugPrint(title, terminator: " - ") }
-		if let date = event.value(forKey: "date") { debugPrint(dateFormatter.string(from: date as! Date), terminator: " - ") }
-		if let rDate = event.value(forKey: "rolledDate") { debugPrint(dateFormatter.string(from: rDate as! Date), terminator: " - ") }
-		if let every = event.value(forKey: "every") { debugPrint("Every: \(Every(rawValue: every as! Int)!)", terminator: " - ") }
-		if let allDay = event.value(forKey: "allday") { debugPrint(allDay, terminator: " - ") }
-		if let rep = event.value(forKey: "repeatition") { debugPrint(rep, terminator: " \n ") }
-
+		if let title = event.title { debugPrint(title, terminator: " - ") }
+		if let date = event.date { debugPrint(dateFormatter.string(from: date as Date), terminator: " - ") }
+		if let rDate = event.rolledDate { debugPrint(dateFormatter.string(from: rDate as Date), terminator: " - ") }
+		debugPrint("Every: \(event.every)", terminator: " - ")
+		debugPrint("\(event.allday)", terminator: " - ")
+		debugPrint(event.repeatition, terminator: " \n ")
 	}
 
 
@@ -345,9 +270,6 @@ class MainController: UITableViewController {
 
 		tableView.beginUpdates()
 
-		//		let row = (self.tableView.indexPath(for: cell)?.row)!
-		//		debugPrint("Editing cell number \(row)")
-
 		performSegue(withIdentifier: "addOrEditSegue", sender: cell)
 
 		tableView.endUpdates()
@@ -355,49 +277,45 @@ class MainController: UITableViewController {
 
 	// MARK: - SEGUE
 
-		override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+
+		if segue.identifier == "addOrEditSegue" {
+
+			debugPrint("Preparing to leave the main controller")
 	
-			if segue.identifier == "addOrEditSegue" {
-	
-				debugPrint("Preparing to leave the main controller")
-	
-				let navigationController = segue.destination as! UINavigationController
-				let destinationController = navigationController.topViewController as! AddOrEditController
-	
-				if sender is UITableViewCell {
-					let row = (self.tableView.indexPath(for: sender as! UITableViewCell)?.row)!
-					destinationController.addOrEditEvent = events[row]
-				} else {
-					destinationController.addOrEditEvent = nil
-				}
-	
+			let navigationController = segue.destination as! UINavigationController
+			let destinationController = navigationController.topViewController as! AddOrEditController
+
+			if sender is UITableViewCell {
+				let row = (self.tableView.indexPath(for: sender as! UITableViewCell)?.row)!
+				destinationController.addOrEditEvent = events[row]
+			} else {
+				destinationController.addOrEditEvent = nil
 			}
-	
 		}
+	}
 
 	@IBAction func unwindToMainController(segue: UIStoryboardSegue) {
 
-		debugPrint("Returned to MainController")
-
 		let navigationController = segue.source as! AddOrEditController
-
 		guard let res = navigationController.theResult else { return }
-		let actionTaken = res.action
 
-		switch actionTaken {
+		switch res.action {
 
 		case .canceled:
 			debugPrint("User canceled")
+			break
 
 		case .added:
 			debugPrint("User added")
-			saveEventWithStruct(res: res)
+			print(res)
+			saveEventWithStruct(eventToSave: nil, res: res)
 			
 		case .edited:
 			debugPrint("User edited")
+			saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
 		}
 
-		print(res)
 		loadEvents()
 		eventsTable.reloadData()
 	}

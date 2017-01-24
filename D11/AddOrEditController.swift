@@ -24,12 +24,14 @@ class AddOrEditController: UITableViewController {
 	@IBOutlet weak var allDaySwitch: UISwitch!
 	@IBOutlet weak var dateLabel: UILabel!
 	@IBOutlet weak var datePicker: UIDatePicker!
-
+	@IBOutlet weak var timeLabel: UILabel!
+	@IBOutlet weak var timePicker: UIDatePicker!
 
 	//MARK: -
 
-	var addOrEditEvent: NSManagedObject?
+	var addOrEditEvent: Event?
 	var datePickerIsVisible: Bool = false
+	var timePickerIsVisible: Bool = false
 	var theResult: Result?
 
 
@@ -60,31 +62,29 @@ class AddOrEditController: UITableViewController {
 
 			// EDIT EXISTING EVENT
 
-			print("\(ev.value(forKey: "title") as! String)")
 			navigationBar.title = "Edit Event"
-			addOrSaveButton.title = "Save"
+			addOrSaveButton.isEnabled = true
 
-			titleTextField.text = ev.value(forKey: "title") as? String
-			allDaySwitch.setOn(ev.value(forKey: "allday") as! Bool, animated: true)
+			titleTextField.text = ev.title!
+			allDaySwitch.setOn(ev.allday, animated: true)
 
 			if allDaySwitch.isOn { datePicker.datePickerMode = .date } else { datePicker.datePickerMode = .dateAndTime }
 
-			tempDate = ev.value(forKey: "date") as? Date
+			tempDate = ev.date as Date?
 
 		} else {
 
-			// ADDIND A NEW EVENT
+			// ADDING A NEW EVENT
 
 			print("No event arrived here from AddOrEditController.")
 			navigationBar.title = "New Event"
-			addOrSaveButton.title = "Add"
+			addOrSaveButton.isEnabled = false
 
 			titleTextField.text = ""
 			allDaySwitch.setOn(true, animated: true)
 			datePicker.datePickerMode = .date
 
 			tempDate = Date()
-
 		}
 
 		displayDate(date: tempDate!)
@@ -224,7 +224,7 @@ class AddOrEditController: UITableViewController {
 				                   repeatition: false,
 				                   every: Every.never
 				)
-
+				debugPrint(theResult!)
 			}
 	     }
 	
@@ -251,7 +251,7 @@ class AddOrEditController: UITableViewController {
 
 	func setupAddTargetIsNotEmptyTextFields() {
 
-		addOrSaveButton.isEnabled = false
+//		addOrSaveButton.isEnabled = false
 		titleTextField.addTarget(self, action: #selector(textFieldsIsNotEmpty), for: .editingChanged)
 	}
 
