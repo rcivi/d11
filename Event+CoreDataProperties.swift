@@ -2,7 +2,7 @@
 //  Event+CoreDataProperties.swift
 //  
 //
-//  Created by Ruggero Civitarese on 21/01/17.
+//  Created by Ruggero Civitarese on 13/02/17.
 //
 //  This file was automatically generated and should not be edited.
 //
@@ -19,8 +19,12 @@ extension Event {
 
     @NSManaged public var allday: Bool
     @NSManaged public var date: Date?
+    @NSManaged public var endRepeatQuantity: Int32
+    @NSManaged public var endRepeatType: Int32
     @NSManaged public var every: Int32
     @NSManaged public var repeatition: Bool
+    @NSManaged public var repeatQuantity: Int32
+    @NSManaged public var repeatType: Int32
     @NSManaged public var rolledDate: Date?
     @NSManaged public var title: String?
 

@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		1379D8B343697A5E9C5CE315 /* Pods_D11.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC487AD705B4DCE34070A2E2 /* Pods_D11.framework */; };
-		8B36DBAB1E2F840700C0E22B /* SwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B36DBAA1E2F840700C0E22B /* SwipeCell.swift */; };
+		8B335BCB1E48C78E00ACC158 /* RepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */; };
 		8B36DBAD1E2F859D00C0E22B /* Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B36DBAC1E2F859D00C0E22B /* Tools.swift */; };
+		8B4C21B01E4E34B5008E759B /* SwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */; };
+		8B56BB211E4B8EA700FF8198 /* RepeatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56BB201E4B8EA700FF8198 /* RepeatController.swift */; };
 		8B9E54901E2F810300AF9F55 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */; };
 		8B9E54951E2F810300AF9F55 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B9E54931E2F810300AF9F55 /* Main.storyboard */; };
 		8B9E54981E2F810300AF9F55 /* D11.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E54961E2F810300AF9F55 /* D11.xcdatamodeld */; };
@@ -21,8 +23,10 @@
 
 /* Begin PBXFileReference section */
 		13A5115BF8F1FCCF907DB355 /* Pods-D11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-D11.release.xcconfig"; path = "Pods/Target Support Files/Pods-D11/Pods-D11.release.xcconfig"; sourceTree = "<group>"; };
-		8B36DBAA1E2F840700C0E22B /* SwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCell.swift; sourceTree = "<group>"; };
+		8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatViewController.swift; sourceTree = "<group>"; };
 		8B36DBAC1E2F859D00C0E22B /* Tools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tools.swift; sourceTree = "<group>"; };
+		8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCell.swift; sourceTree = "<group>"; };
+		8B56BB201E4B8EA700FF8198 /* RepeatController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatController.swift; sourceTree = "<group>"; };
 		8B9E548C1E2F810300AF9F55 /* D11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = D11.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8B9E54941E2F810300AF9F55 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -72,10 +76,12 @@
 				8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */,
 				8B9E54A41E2F819600AF9F55 /* MainController.swift */,
 				8B9E54A61E2F81AA00AF9F55 /* AddOrEditController.swift */,
+				8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */,
+				8B56BB201E4B8EA700FF8198 /* RepeatController.swift */,
 				8B9E54931E2F810300AF9F55 /* Main.storyboard */,
 				8B9E54991E2F810300AF9F55 /* Assets.xcassets */,
-				8B36DBAA1E2F840700C0E22B /* SwipeCell.swift */,
 				8B36DBAC1E2F859D00C0E22B /* Tools.swift */,
+				8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */,
 				8B9E549B1E2F810300AF9F55 /* LaunchScreen.storyboard */,
 				8B9E549E1E2F810300AF9F55 /* Info.plist */,
 				8B9E54961E2F810300AF9F55 /* D11.xcdatamodeld */,
@@ -224,11 +230,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B335BCB1E48C78E00ACC158 /* RepeatViewController.swift in Sources */,
 				8B9E54A51E2F819600AF9F55 /* MainController.swift in Sources */,
-				8B36DBAB1E2F840700C0E22B /* SwipeCell.swift in Sources */,
+				8B4C21B01E4E34B5008E759B /* SwipeCell.swift in Sources */,
 				8B9E54901E2F810300AF9F55 /* AppDelegate.swift in Sources */,
 				8B9E54981E2F810300AF9F55 /* D11.xcdatamodeld in Sources */,
 				8B36DBAD1E2F859D00C0E22B /* Tools.swift in Sources */,
+				8B56BB211E4B8EA700FF8198 /* RepeatController.swift in Sources */,
 				8B9E54A71E2F81AA00AF9F55 /* AddOrEditController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -356,10 +364,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = B945VFJPE5;
 				INFOPLIST_FILE = D11/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = it.rug.D11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -371,10 +381,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = B945VFJPE5;
 				INFOPLIST_FILE = D11/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = it.rug.D11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

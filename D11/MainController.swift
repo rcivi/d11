@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import SwiftDate
+import UserNotifications
 
 
 class EventCell: SwipeCell {
@@ -27,6 +28,7 @@ class MainController: UITableViewController {
 
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
+	var badgeCount: Int = 0
 	var events = [Event]()
 	var managedObjectContext: NSManagedObjectContext?
 
@@ -40,6 +42,10 @@ class MainController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+		// Working directory of the simulator
+		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+		print("Simulator working direcotry: \(dirPaths[0])")
 
 		// Removes empty lines in the table
 		eventsTable.tableFooterView = UIView()
@@ -71,20 +77,38 @@ class MainController: UITableViewController {
 
 		cell.swipeDelegate = self
 
+		let today = Date()
 		let ev = events[indexPath.row]
+
+		print("EVENTO APPENA CARICATO")
+		print(ev)
 
 		guard let tit = ev.value(forKey: "title") as? String else { print("Title error"); return cell }
 		guard let dt1 = ev.value(forKey: "date") as? Date else { print("Date error"); return cell }
-		guard let evrN = ev.value(forKey: "every") as? Int else { print("Every error"); return cell }
+		guard let evrN = ev.value(forKey: "repeatType") as? Int else { print("Every Type error"); return cell }
+		guard let evrQN = ev.value(forKey: "repeatQuantity") as? Int else { print("Every Quantity error"); return cell }
+
+		guard let ert = ev.value(forKey: "endRepeatType") as? Int else { print("Repeat Type error"); return cell }
+		guard let erq = ev.value(forKey: "endRepeatQuantity") as? Int else { print("Repeat Quantity Type error"); return cell }
+
+
 		let evr = Every(rawValue: evrN)!
 
-		let (newDate, colloquial) = dateDistanceFromNow(toDate: dt1, repeatTime: evr)
+		let (newDate, colloquial) = dateDistanceFromNow(toDate: dt1, repeatType: evr, repeatQuantity: evrQN, endRepeatType: ert, endRepeatQuantity: erq)
+
+		let debugString = "\(tit), \(colloquial) - DB: \(dt1) - Rpt: \(newDate) - (T\(evrN),Q\(evrQN),ER\(erq)) - Now: \(today)"
+		debugPrint(debugString)
 
 		cell.titleLabel.text = tit
-		cell.detail1Label.text = dt1.string(format: .custom("dd-M-yyyy")) + "(r\(evrN))"
-		cell.detail2Label.text = colloquial
+		cell.detail1Label.text = colloquial
+		cell.detail2Label.text = ""
 
-		if newDate < Date() { cell.detail2Label.textColor = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1) }
+		if newDate < today {
+			cell.detail1Label.textColor = UIColor.red
+			badgeCount += 1
+		} else {
+			cell.detail1Label.textColor = UIColor.black
+		}
 
 
 
@@ -105,7 +129,7 @@ class MainController: UITableViewController {
 
 
 		// SWIPE LEFT TO EDIT
-		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.left1, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "pencil")), color: .purple) { (cell) -> () in
+		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.left1, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "pencil")), color: .orange) { (cell) -> () in
 			self.editCell(cell: cell)
 		}
 
@@ -119,34 +143,10 @@ class MainController: UITableViewController {
 
 	// MARK: - DATE MANAGEMENT
 
-	func rollDate(startDate: Date, repeatTime: Every) -> Date {
 
-		var newDate = startDate
+	func dateDistanceFromNow(toDate: Date, repeatType: Every, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) -> (Date, String) {
 
-		if newDate.isInPast && repeatTime != Every.never {
-			while newDate.isBefore(date: Date(), granularity: .day) {
-
-				switch(repeatTime) {
-				case Every.never:
-					break
-				case Every.day:
-					newDate = newDate + 1.day
-				case Every.week:
-					newDate = newDate + 1.week
-				case Every.month:
-					newDate = newDate + 1.month
-				case Every.year:
-					newDate = newDate + 1.year
-				}
-			}
-		}
-		return newDate
-	}
-
-
-	func dateDistanceFromNow(toDate: Date, repeatTime: Every) -> (Date, String) {
-
-		let newDate = rollDate(startDate: toDate, repeatTime: repeatTime)
+		let newDate = rollDate(startDate: toDate, repeatType: repeatType, repeatQuantity: repeatQuantity, endRepeatType: endRepeatType, endRepeatQuantity: endRepeatQuantity)
 		var stringResult: String = ""
 
 		do {
@@ -160,19 +160,54 @@ class MainController: UITableViewController {
 	}
 
 
+	func rollDate(startDate: Date, repeatType: Every, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) -> Date {
+
+		var newDate = startDate
+		let rquantity = repeatQuantity + 1 // To change from position to value
+		let erquantity = endRepeatType == 0 ? 0 : endRepeatQuantity
+
+		var countRepetitions = 0
+
+		if newDate.isInPast && repeatType != Every.never {
+			while newDate.isBefore(date: Date(), granularity: .second) && countRepetitions <= erquantity {
+
+				countRepetitions += endRepeatType == 0 ? 0 : 1
+
+				switch(repeatType) {
+				case Every.never:
+					break
+				case Every.hour:
+					newDate = newDate + rquantity.hour
+				case Every.day:
+					newDate = newDate + rquantity.day
+				case Every.week:
+					newDate = newDate + rquantity.week
+				case Every.month:
+					newDate = newDate + rquantity.month
+				case Every.quarter:
+					newDate = newDate + (rquantity * 3).month
+				case Every.year:
+					newDate = newDate + rquantity.year
+				}
+			}
+		}
+		return newDate
+	}
+
+
 	// MARK: - CORE DATA MANAGEMENT
 
 	func createInitialRecords() {
 
 		deleteAllEvents()
 
-		let r1 = Result(action: .added, title: "Passaporto Ruggero", date: "23-6-2025", allday: true, repeatition: false, every: .never)
-		let r2 = Result(action: .added, title: "Compleanno Bianca", date: "4-2-1996", allday: true, repeatition: false, every: .year)
-		let r3 = Result(action: .added, title: "Compleanno Clara", date: "25-7-1962", allday: true, repeatition: false, every: .year)
-		let r4 = Result(action: .added, title: "Compleanno Pietro", date: "8-1-1999", allday: true, repeatition: false, every: .year)
-		let r5 = Result(action: .added, title: "EZ Birthday", date: "29-11-2010", allday: true, repeatition: false, every: .year)
-		let r6 = Result(action: .added, title: "Testo molto più lungo di un reminder", date: "17-1-2017", allday: true, repeatition: false, every: .never)
-		let r7 = Result(action: .added, title: "Pippo", date: "12-12-2018", allday: true, repeatition: false, every: Every.never)
+
+		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r2 = Result(action: .added, title: "Compleanno Bianca", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r3 = Result(action: .added, title: "Compleanno Clara", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r4 = Result(action: .added, title: "Compleanno Pietro", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
 
 
 		saveEventWithStruct(eventToSave: nil, res: r1)
@@ -181,21 +216,24 @@ class MainController: UITableViewController {
 		saveEventWithStruct(eventToSave: nil, res: r4)
 		saveEventWithStruct(eventToSave: nil, res: r5)
 		saveEventWithStruct(eventToSave: nil, res: r6)
-		saveEventWithStruct(eventToSave: nil, res: r7)
 
 	}
 
 	func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
 		let event: Event = eventToSave != nil ? eventToSave! : Event(context: managedObjectContext!)
-		let date: Date =  res.allday ? dateOnlyFormatter.date(from: res.date)! : dateAndTimeFormatter.date(from: res.date)!
+		let date: Date =  res.date
 
 		event.title = res.title
 		event.date = date as NSDate
-		event.rolledDate = rollDate(startDate: date, repeatTime: res.every) as NSDate?
-		event.every = Int32(res.every.rawValue)
+
+		event.rolledDate = rollDate(startDate: date, repeatType: Every(rawValue: res.repeatType)!, repeatQuantity: res.repeatQuantity, endRepeatType: res.endRepeatType, endRepeatQuantity: res.endRepeatQuantity)  as NSDate?
+
 		event.allday = true
-		event.repeatition = false
+		event.repeatType = Int32(res.repeatType)
+		event.repeatQuantity = Int32(res.repeatQuantity)
+		event.endRepeatType = Int32(res.endRepeatType)
+		event.endRepeatQuantity = Int32(res.endRepeatQuantity)
 
 		do {
 			try managedObjectContext!.save()
@@ -235,9 +273,11 @@ class MainController: UITableViewController {
 		if let title = event.title { debugPrint(title, terminator: " - ") }
 		if let date = event.date { debugPrint(dateFormatter.string(from: date as Date), terminator: " - ") }
 		if let rDate = event.rolledDate { debugPrint(dateFormatter.string(from: rDate as Date), terminator: " - ") }
+
 		debugPrint("Every: \(event.every)", terminator: " - ")
 		debugPrint("\(event.allday)", terminator: " - ")
-		debugPrint(event.repeatition, terminator: " \n ")
+		debugPrint(event.repeatType, terminator: " - ")
+		debugPrint(event.repeatQuantity, terminator: " \n ")
 	}
 
 
@@ -299,25 +339,36 @@ class MainController: UITableViewController {
 
 		let navigationController = segue.source as! AddOrEditController
 		guard let res = navigationController.theResult else { return }
+		
+		print(res)
 
 		switch res.action {
 
 		case .canceled:
-			debugPrint("User canceled")
 			break
 
 		case .added:
-			debugPrint("User added")
-			print(res)
 			saveEventWithStruct(eventToSave: nil, res: res)
 			
 		case .edited:
-			debugPrint("User edited")
 			saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
 		}
 
 		loadEvents()
 		eventsTable.reloadData()
+	}
+
+	// MARK: - BADGE NOTIFICATION
+
+	func badgeNotification(badgeCount: Int) {
+
+		let application = UIApplication.shared
+		let center = UNUserNotificationCenter.current()
+		center.requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
+			// Enable or disable features based on authorization.
+			print(granted)
+		}
+		application.applicationIconBadgeNumber = badgeCount
 	}
 
 }

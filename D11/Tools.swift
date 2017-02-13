@@ -16,6 +16,12 @@ var dateOnlyFormatter: DateFormatter {
 	return dateFormatter
 }
 
+var timeOnlyFormatter: DateFormatter {
+	let timeFormatter = DateFormatter()
+	timeFormatter.dateFormat = "HH:mm"
+	return timeFormatter
+}
+
 var dateAndTimeFormatter: DateFormatter {
 	let dateFormatter = DateFormatter()
 	dateFormatter.dateFormat = "d-M-yyyy HH:mm"
@@ -24,10 +30,12 @@ var dateAndTimeFormatter: DateFormatter {
 
 enum Every: Int {
 	case never = 0
-	case day   = 1
-	case week  = 2
-	case month = 3
-	case year  = 4
+	case hour = 1
+	case day   = 2
+	case week  = 3
+	case month = 4
+	case quarter = 5
+	case year  = 6
 }
 
 enum ActionToReturn {
@@ -36,23 +44,35 @@ enum ActionToReturn {
 	case added
 }
 
+enum PickerTag: Int {
+	case repeatTag = 1
+	case endRepeatTag = 2
+}
+
+
 struct Result {
 
 	var action: ActionToReturn
 	var title: String
-	var date: String
+	var date: Date
 	var allday: Bool
-	var repeatition: Bool
-	var every: Every
+//	var repeatition: Bool
+//	var every: Every
+	var repeatType: Int
+	var repeatQuantity: Int
+	var endRepeatType: Int
+	var endRepeatQuantity: Int
 //	var rolledDate: Date
 	
 	
-	init(action: ActionToReturn, title: String, date: String, allday: Bool, repeatition: Bool, every: Every) {
+	init(action: ActionToReturn, title: String, date: Date, allday: Bool, repeatType: Int, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) {
 		self.action = action
 		self.title = title
 		self.date = date
 		self.allday = allday
-		self.repeatition = repeatition
-		self.every = every
+		self.repeatType = repeatType
+		self.repeatQuantity = repeatQuantity
+		self.endRepeatType = endRepeatType
+		self.endRepeatQuantity = endRepeatQuantity
 	}
 }
