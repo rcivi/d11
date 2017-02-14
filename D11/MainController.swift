@@ -44,8 +44,8 @@ class MainController: UITableViewController {
         super.viewDidLoad()
 
 		// Working directory of the simulator
-		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-		print("Simulator working direcotry: \(dirPaths[0])")
+//		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+//		print("Simulator working direcotry: \(dirPaths[0])")
 
 		// Removes empty lines in the table
 		eventsTable.tableFooterView = UIView()
@@ -91,6 +91,10 @@ class MainController: UITableViewController {
 		guard let ert = ev.value(forKey: "endRepeatType") as? Int else { print("Repeat Type error"); return cell }
 		guard let erq = ev.value(forKey: "endRepeatQuantity") as? Int else { print("Repeat Quantity Type error"); return cell }
 
+		guard let nt = ev.value(forKey: "notifyType") as? Int else { print("Repeat Type error"); return cell }
+		guard let nq = ev.value(forKey: "notifyQuantity") as? Int else { print("Repeat Type error"); return cell }
+		guard let nm = ev.value(forKey: "notifyMode") as? Int else { print("Repeat Type error"); return cell }
+
 
 		let evr = Every(rawValue: evrN)!
 
@@ -103,11 +107,28 @@ class MainController: UITableViewController {
 		cell.detail1Label.text = colloquial
 		cell.detail2Label.text = ""
 
-		if newDate < today {
-			cell.detail1Label.textColor = UIColor.red
-			badgeCount += 1
+		let notificationDate = getNotificationDate(date: newDate, notifyType: nt, notifyQuantity: nq, notifyMode: nm)
+
+		print("Notificationdate: \(notificationDate)")
+
+		if nm == 0 {
+			// BEFORE MODE
+			if today < notificationDate {
+				cell.detail1Label.textColor = UIColor.black
+			} else if today >= notificationDate && today < newDate {
+				cell.detail1Label.textColor = UIColor.orange
+			} else if today >= newDate {
+				cell.detail1Label.textColor = UIColor.red
+			}
 		} else {
-			cell.detail1Label.textColor = UIColor.black
+			// AFTER MODE
+			if today < newDate {
+				cell.detail1Label.textColor = UIColor.black
+			} else if today >= newDate && today < notificationDate {
+				cell.detail1Label.textColor = UIColor.orange
+			} else if today >= notificationDate {
+				cell.detail1Label.textColor = UIColor.red
+			}
 		}
 
 
@@ -140,8 +161,59 @@ class MainController: UITableViewController {
 
 
 
-
 	// MARK: - DATE MANAGEMENT
+
+	func getNotificationDate(date: Date, notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> Date {
+
+		var notificationDate = date
+		let notificationQuantity = notifyQuantity + 1
+		let notificationType = Every(rawValue: notifyType)!
+		let notificationMode = Mode(rawValue: notifyMode)!
+
+		switch(notificationType) {
+
+		case Every.never:
+			break
+		case Every.hour:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - notificationQuantity.hour
+			case Mode.after: notificationDate = notificationDate + notificationQuantity.hour
+			}
+
+		case Every.day:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - notificationQuantity.day
+			case Mode.after: notificationDate = notificationDate + notificationQuantity.day
+			}
+
+		case Every.week:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - notificationQuantity.week
+			case Mode.after: notificationDate = notificationDate + notificationQuantity.week
+			}
+
+		case Every.month:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - notificationQuantity.month
+			case Mode.after: notificationDate = notificationDate + notificationQuantity.month
+			}
+
+		case Every.quarter:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - (notificationQuantity * 3).month
+			case Mode.after: notificationDate = notificationDate + (notificationQuantity * 3).month
+			}
+
+		case Every.year:
+			switch(notificationMode) {
+			case Mode.before: notificationDate = notificationDate - notificationQuantity.year
+			case Mode.after: notificationDate = notificationDate + notificationQuantity.year
+			}
+
+		}
+		
+		return notificationDate
+	}
 
 
 	func dateDistanceFromNow(toDate: Date, repeatType: Every, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) -> (Date, String) {
@@ -174,6 +246,7 @@ class MainController: UITableViewController {
 				countRepetitions += endRepeatType == 0 ? 0 : 1
 
 				switch(repeatType) {
+
 				case Every.never:
 					break
 				case Every.hour:
@@ -197,17 +270,18 @@ class MainController: UITableViewController {
 
 	// MARK: - CORE DATA MANAGEMENT
 
+
 	func createInitialRecords() {
 
 		deleteAllEvents()
 
-
-		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
-		let r2 = Result(action: .added, title: "Compleanno Bianca", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
-		let r3 = Result(action: .added, title: "Compleanno Clara", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
-		let r4 = Result(action: .added, title: "Compleanno Pietro", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
-		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
-		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0)
+		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
+		let r2 = Result(action: .added, title: "Compleanno Bianca", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r3 = Result(action: .added, title: "Compleanno Clara", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r4 = Result(action: .added, title: "Compleanno Pietro", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
+		let r7 = Result(action: .added, title: "Evento con titolo molto lungo", date: Date())
 
 
 		saveEventWithStruct(eventToSave: nil, res: r1)
@@ -216,8 +290,10 @@ class MainController: UITableViewController {
 		saveEventWithStruct(eventToSave: nil, res: r4)
 		saveEventWithStruct(eventToSave: nil, res: r5)
 		saveEventWithStruct(eventToSave: nil, res: r6)
+		saveEventWithStruct(eventToSave: nil, res: r7)
 
 	}
+	
 
 	func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
@@ -234,6 +310,9 @@ class MainController: UITableViewController {
 		event.repeatQuantity = Int32(res.repeatQuantity)
 		event.endRepeatType = Int32(res.endRepeatType)
 		event.endRepeatQuantity = Int32(res.endRepeatQuantity)
+		event.notifyType = Int32(res.notifyType)
+		event.notifyQuantity = Int32(res.notifyQuantity)
+		event.notifyMode = Int32(res.notifyMode)
 
 		do {
 			try managedObjectContext!.save()

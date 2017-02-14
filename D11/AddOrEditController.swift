@@ -30,8 +30,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	@IBOutlet weak var repeatLabel: UILabel!
 	@IBOutlet weak var endRepeatPicker: UIPickerView!
 	@IBOutlet weak var endRepeatLabel: UILabel!
+	@IBOutlet weak var notifyLabel: UILabel!
+	@IBOutlet weak var notifyPicker: UIPickerView!
 
-	
 
 	//MARK: - VARIABLES
 
@@ -40,6 +41,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	var timePickerIsVisible: Bool = false
 	var repeatPickerIsVisible: Bool = false
 	var endRepeatPickerIsVisible: Bool = false
+	var notifyPickerIsVisible: Bool = false
 
 	var theResult: Result?
 	var theDate: Date = Date()
@@ -47,10 +49,17 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	var theRepeatQuantity: Int = 0
 	var theEndRepeatType: Int = 0
 	var theEndRepeatQuantity: Int = 0
+	var theNotifyType: Int = 0
+	var theNotifyQuantity: Int = 0
+	var theNotifyMode: Int = 0
 	
 	let repeats: [String] = ["never", "hour", "day", "week", "month", "quarter", "year"]
 	let repeatsPlurals: [String] = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
 	let endRepatMenu: [String] = ["never", "after"]
+
+	let notifyTypeMenu: [String] = 	["never", "hour", "day", "week", "month", "quarter", "year"]
+	let notifyTypeMenuPlurals: [String] = 	["never", "hours", "days", "weeks", "months", "quarters", "years"]
+	let notifyModeMenu: [String] = ["before", "after"]
 
 	var activeRowInComp1: Int = 0
 	let maxNumberOfCases: Int = 99
@@ -93,6 +102,10 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			theEndRepeatType = Int(ev.endRepeatType)
 			theEndRepeatQuantity = Int(ev.endRepeatQuantity)
 
+			theNotifyType = Int(ev.notifyType)
+			theNotifyQuantity = Int(ev.notifyQuantity)
+			theNotifyMode = Int(ev.notifyMode)
+
 		} else {
 
 			// ADDING A NEW EVENT
@@ -112,6 +125,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		timeLabel.text = timeOnlyFormatter.string(from: theDate)
 		repeatLabel.text = repeatTextForRepeatLabel(repeatType: theRepeatType, repeatQuantity: theRepeatQuantity)
 		endRepeatLabel.text = endRepeatTextForEndRepeatLabel(endRepeatType: theEndRepeatType, endRepeatQuantity: theEndRepeatQuantity)
+		notifyLabel.text = notifyTextForNotifyLabel(notifyType: theNotifyType, notifyQuantity: theNotifyQuantity, notifyMode: theNotifyMode)
 
 		datePicker.setDate(theDate, animated: true)
 		timePicker.setDate(theDate, animated: true)
@@ -119,6 +133,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		repeatPicker.selectRow(theRepeatQuantity, inComponent: 0, animated: true)
 		endRepeatPicker.selectRow(theEndRepeatType, inComponent: 0, animated: true)
 		endRepeatPicker.selectRow(theEndRepeatQuantity, inComponent: 1, animated: true)
+		notifyPicker.selectRow(theNotifyQuantity, inComponent: 0, animated: true)
+		notifyPicker.selectRow(theNotifyType, inComponent: 1, animated: true)
+		notifyPicker.selectRow(theNotifyMode, inComponent: 2, animated: true)
 
 	}
 
@@ -131,7 +148,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
 
-		return 3
+		return 4
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -143,6 +160,8 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			return 5
 		case 2:
 			return 4
+		case 3:
+			return 2
 		default:
 			return 0
 		}
@@ -162,6 +181,8 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			if theRepeatType == 0 { heigth = 0.0 } else { heigth = 44.0 }
 		} else if indexPath.section == 2 && indexPath.row == 3 {
 			if endRepeatPickerIsVisible { heigth = 238.0 } else { heigth = 0.0 }
+		} else if indexPath.section == 3 && indexPath.row == 1 {
+			if notifyPickerIsVisible { heigth = 238.0 } else { heigth = 0.0 }
 		} else {
 			heigth = 44.0
 		}
@@ -178,30 +199,42 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
+			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 1 && indexPath.row == 3 {
 			timePickerIsVisible = !timePickerIsVisible
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
+			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 2 && indexPath.row == 0 {
 			// REPEAT CELL CLICKED
 			repeatPickerIsVisible = !repeatPickerIsVisible
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
-
+			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 2 && indexPath.row == 2 {
 			// END REPEAT CELL CLICKED
 			endRepeatPickerIsVisible = !endRepeatPickerIsVisible
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
+			if notifyPickerIsVisible { notifyPickerIsVisible = false }
+		} else if indexPath.section == 3 && indexPath.row == 0 {
+			// NOTIFY CELL CLICKED
+			notifyPickerIsVisible = !notifyPickerIsVisible
+			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
+			if datePickerIsVisible { datePickerIsVisible = false }
+			if timePickerIsVisible { timePickerIsVisible = false }
+			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 		}
+
 
 		if datePickerIsVisible { dateLabel.textColor = UIColor.red } else { dateLabel.textColor = UIColor.black }
 		if timePickerIsVisible { timeLabel.textColor = UIColor.red } else { timeLabel.textColor = UIColor.black }
 		if repeatPickerIsVisible { repeatLabel.textColor = UIColor.red } else { repeatLabel.textColor = UIColor.black }
 		if endRepeatPickerIsVisible { endRepeatLabel.textColor = UIColor.red } else { endRepeatLabel.textColor = UIColor.black }
+		if notifyPickerIsVisible { notifyLabel.textColor = UIColor.red } else { notifyLabel.textColor = UIColor.black }
 
 		addOrEditTable.reloadData()
 		tableView.endUpdates()
@@ -223,6 +256,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 		case PickerTag.endRepeatTag:
 			return 3
+
+		case PickerTag.notifyTag:
+			return 3
 		}
 
 	}
@@ -240,6 +276,17 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			if component == 1 { return theEndRepeatType == 0 ? 1 : 100 }
 			if component == 2 { return theEndRepeatType == 0 ? 1 : 1 }
 			endRepeatPicker.reloadAllComponents()
+
+		case PickerTag.notifyTag:
+			if component == 0 {
+				return theNotifyType == 0 ? 1 : 100
+			} else if component == 1 {
+				return notifyTypeMenu.count
+			} else if component == 2 {
+				return notifyModeMenu.count
+			} else {
+				return 0
+			}
 		}
 		return 0
 	}
@@ -260,6 +307,14 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			} else {
 				return theEndRepeatType == 0 ? "" : theEndRepeatQuantity > 0 ? "times" : "time"
 			}
+		case PickerTag.notifyTag:
+			if component == 0 {
+				return theNotifyType == 0 ? "–" : String(row + 1)
+			} else if component == 1 {
+				return notifyTypeMenu[row]
+			} else {
+				return notifyModeMenu[row]
+			}
 		}
 	}
 
@@ -277,6 +332,15 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 				return 50.0
 			} else {
 				return 70.0
+			}
+
+		case PickerTag.notifyTag:
+			if component == 0 {
+				return 50.0
+			} else if component == 1 {
+				return 110.0
+			} else {
+				return 110.0
 			}
 		}
 	}
@@ -305,7 +369,29 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			endRepeatPicker.reloadAllComponents()
 
 			endRepeatLabel.text = endRepeatTextForEndRepeatLabel(endRepeatType: theEndRepeatType, endRepeatQuantity: theEndRepeatQuantity)
+
+		case PickerTag.notifyTag:
+			if component == 1 {
+				theNotifyType = row
+				notifyPicker.reloadAllComponents()
+			}
+
+						let notifyType = notifyPicker.selectedRow(inComponent: 1)
+						let notifyQuantity = notifyPicker.selectedRow(inComponent: 0)
+						let notifyMode = notifyPicker.selectedRow(inComponent: 2)
+
+			notifyLabel.text = notifyTextForNotifyLabel(notifyType: notifyType, notifyQuantity: notifyQuantity, notifyMode: notifyMode)
 		}
+	}
+
+	func notifyTextForNotifyLabel(notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> String {
+
+		let notifyQuantityStr = notifyType == 0 ? "" : String(notifyQuantity + 1)
+		let notifyModeStr = notifyType == 0 ? "" : notifyModeMenu[notifyMode]
+
+		let notifyTypeStr = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
+
+		return "\(notifyQuantityStr) \(notifyTypeStr) \(notifyModeStr)".trimmingCharacters(in: .whitespaces)
 	}
 
 	func endRepeatTextForEndRepeatLabel(endRepeatType: Int, endRepeatQuantity: Int) -> String {
@@ -423,6 +509,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			let endRepeatType = endRepeatPicker.selectedRow(inComponent: 0)
 			let endRepeatQuantity = endRepeatPicker.selectedRow(inComponent: 1)
 			let title = titleTextField.text!.trimmingCharacters(in: .whitespaces)
+			let notifyType = notifyPicker.selectedRow(inComponent: 1)
+			let notifyQuantity = notifyPicker.selectedRow(inComponent: 0)
+			let notifyMode = notifyPicker.selectedRow(inComponent: 2)
 			
 			var action: ActionToReturn
 
@@ -436,7 +525,19 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 				}
 			}
 
-			theResult = Result(action: action, title: title, date: theDate, allday: allDaySwitch.isOn, repeatType: repeatType, repeatQuantity: repeatQuantity, endRepeatType: endRepeatType, endRepeatQuantity: endRepeatQuantity)
+			theResult = Result(
+				action: action,
+				title: title,
+				date: theDate,
+				allday: allDaySwitch.isOn,
+				repeatType: repeatType,
+				repeatQuantity: repeatQuantity,
+				endRepeatType: endRepeatType,
+				endRepeatQuantity: endRepeatQuantity,
+				notifyType: notifyType,
+				notifyQuantity: notifyQuantity,
+				notifyMode: notifyMode
+			)
 
 			debugPrint(theResult!)
 		}

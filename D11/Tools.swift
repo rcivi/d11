@@ -38,6 +38,11 @@ enum Every: Int {
 	case year  = 6
 }
 
+enum Mode: Int {
+	case before = 0
+	case after = 1
+}
+
 enum ActionToReturn {
 	case canceled
 	case edited
@@ -47,6 +52,7 @@ enum ActionToReturn {
 enum PickerTag: Int {
 	case repeatTag = 1
 	case endRepeatTag = 2
+	case notifyTag = 3
 }
 
 
@@ -56,16 +62,16 @@ struct Result {
 	var title: String
 	var date: Date
 	var allday: Bool
-//	var repeatition: Bool
-//	var every: Every
 	var repeatType: Int
 	var repeatQuantity: Int
 	var endRepeatType: Int
 	var endRepeatQuantity: Int
-//	var rolledDate: Date
+	var notifyType: Int
+	var notifyQuantity: Int
+	var notifyMode: Int
+
 	
-	
-	init(action: ActionToReturn, title: String, date: Date, allday: Bool, repeatType: Int, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) {
+	init(action: ActionToReturn, title: String, date: Date, allday: Bool = true, repeatType: Int = 0, repeatQuantity: Int = 0, endRepeatType: Int = 0, endRepeatQuantity: Int = 0, notifyType: Int = 0, notifyQuantity: Int = 0, notifyMode: Int = 0) {
 		self.action = action
 		self.title = title
 		self.date = date
@@ -74,5 +80,9 @@ struct Result {
 		self.repeatQuantity = repeatQuantity
 		self.endRepeatType = endRepeatType
 		self.endRepeatQuantity = endRepeatQuantity
+		self.notifyType = notifyType
+		self.notifyQuantity = notifyQuantity
+		self.notifyMode = notifyMode
 	}
 }
+
