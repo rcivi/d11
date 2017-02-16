@@ -27,10 +27,10 @@ class MainController: UITableViewController {
 	@IBOutlet var eventsTable: UITableView!
 
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+	var managedObjectContext: NSManagedObjectContext?
 
 	var badgeCount: Int = 0
 	var events = [Event]()
-	var managedObjectContext: NSManagedObjectContext?
 
 
 	var dateFormatter: DateFormatter {
@@ -39,6 +39,9 @@ class MainController: UITableViewController {
 		return dateFormatter
 	}
 
+
+
+	// MARK: -
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,9 +58,8 @@ class MainController: UITableViewController {
 
 		createInitialRecords()
 
+		loadPreferences()
 		loadEvents()
-		
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -65,7 +67,7 @@ class MainController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-	// MARK: - Table view data source
+	// MARK: - TABLE VIEW DATA SOURCE
 
 	override func numberOfSections(in tableView: UITableView) -> Int { return 1 }
 
@@ -104,33 +106,20 @@ class MainController: UITableViewController {
 		debugPrint(debugString)
 
 		cell.titleLabel.text = tit
-		cell.detail1Label.text = colloquial
+		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)   // "\(newDate)"
 		cell.detail2Label.text = ""
 
+		let font = cell.titleLabel.font.fontName
+		let size = NSNumber(value: Double(titleFontSize))
+		cell.titleLabel.font = UIFont(name: font, size: CGFloat(size))
+
+		let font1 = cell.detail1Label.font.fontName
+		let size1 = NSNumber(value: Double(detailFontSize))
+		cell.detail1Label.font = UIFont(name: font1, size: CGFloat(size1))
+
+
 		let notificationDate = getNotificationDate(date: newDate, notifyType: nt, notifyQuantity: nq, notifyMode: nm)
-
-		print("Notificationdate: \(notificationDate)")
-
-		if nm == 0 {
-			// BEFORE MODE
-			if today < notificationDate {
-				cell.detail1Label.textColor = UIColor.black
-			} else if today >= notificationDate && today < newDate {
-				cell.detail1Label.textColor = UIColor.orange
-			} else if today >= newDate {
-				cell.detail1Label.textColor = UIColor.red
-			}
-		} else {
-			// AFTER MODE
-			if today < newDate {
-				cell.detail1Label.textColor = UIColor.black
-			} else if today >= newDate && today < notificationDate {
-				cell.detail1Label.textColor = UIColor.orange
-			} else if today >= notificationDate {
-				cell.detail1Label.textColor = UIColor.red
-			}
-		}
-
+		cell.detail1Label.textColor = getTextLabelColor(notifyMode: nm, notificationDate: notificationDate, eventDate: newDate)
 
 
 		// SWIPE RIGHT1 TO DELETE
@@ -154,14 +143,44 @@ class MainController: UITableViewController {
 			self.editCell(cell: cell)
 		}
 
-
-
 		return cell
 	}
 
 
 
 	// MARK: - DATE MANAGEMENT
+
+	func getTextLabelColor(notifyMode: Int, notificationDate: Date, eventDate: Date) -> UIColor {
+
+		let nmode = Mode(rawValue: notifyMode)!
+		var returnColor = normalColor
+		let today = Date()
+
+		switch nmode {
+
+		case Mode.before:
+			if today < notificationDate {
+				returnColor = normalColor
+			} else if today >= notificationDate && today < eventDate {
+				returnColor = attentionColor
+			} else if today >= eventDate {
+				returnColor = alarmColor
+			}
+
+		case Mode.after:
+			if today < eventDate {
+				returnColor = normalColor
+			} else if today >= eventDate && today < notificationDate {
+				returnColor = attentionColor
+			} else if today >= notificationDate {
+				returnColor = alarmColor
+			}
+
+		}
+
+		return returnColor
+	}
+
 
 	func getNotificationDate(date: Date, notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> Date {
 
@@ -419,7 +438,7 @@ class MainController: UITableViewController {
 		let navigationController = segue.source as! AddOrEditController
 		guard let res = navigationController.theResult else { return }
 		
-		print(res)
+//		print(res)
 
 		switch res.action {
 
@@ -437,6 +456,13 @@ class MainController: UITableViewController {
 		eventsTable.reloadData()
 	}
 
+	@IBAction func unwindToMainControllerFromPreferences(segue: UIStoryboardSegue) {
+
+		debugPrint("Unwind from Preferences")
+		loadPreferences()
+		eventsTable.reloadData()
+	}
+
 	// MARK: - BADGE NOTIFICATION
 
 	func badgeNotification(badgeCount: Int) {
@@ -448,6 +474,40 @@ class MainController: UITableViewController {
 			print(granted)
 		}
 		application.applicationIconBadgeNumber = badgeCount
+	}
+
+	// MArk: - LOAD PREFERENCES
+
+	func loadPreferences() {
+
+//		var colloquialIsOn: Bool = false
+//		var normalColor: UIColor = .black
+//		var attentionColor: UIColor = .orange
+//		var alarmColor: UIColor = .red
+//		var titleFontSize: Int = 20
+//		var detailFontSize: Int = 13
+
+
+
+//		let colloquialKey = "colloquial"
+//		let normalColorKey = "normalColor"
+//		let attentioncolorKey = "attentionColor"
+//		let alertColorKey = "alertColor"
+//		let titleFontSizeKey = "titleFontSize"
+//		let detailFontSizeKey = "detailFontSize"
+
+		let defaults = UserDefaults.standard
+		colloquialIsOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
+
+		//		let font = titleLabel.font.fontName
+		//		titleLabel.font = UIFont(name: font, size: size)
+
+		titleFontSize = defaults.float(forKey: PrefsKey.titleFontSizeKey.rawValue)
+		if titleFontSize == 0.0 { titleFontSize = 20.0 }
+
+		detailFontSize = defaults.float(forKey: PrefsKey.detailFontSizeKey.rawValue)
+		if detailFontSize == 0.0 { detailFontSize = 13.0 }
+
 	}
 
 }

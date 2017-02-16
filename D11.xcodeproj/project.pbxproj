@@ -8,10 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1379D8B343697A5E9C5CE315 /* Pods_D11.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC487AD705B4DCE34070A2E2 /* Pods_D11.framework */; };
-		8B335BCB1E48C78E00ACC158 /* RepeatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */; };
 		8B36DBAD1E2F859D00C0E22B /* Tools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B36DBAC1E2F859D00C0E22B /* Tools.swift */; };
-		8B4C21B01E4E34B5008E759B /* SwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */; };
-		8B56BB211E4B8EA700FF8198 /* RepeatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56BB201E4B8EA700FF8198 /* RepeatController.swift */; };
 		8B9E54901E2F810300AF9F55 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */; };
 		8B9E54951E2F810300AF9F55 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B9E54931E2F810300AF9F55 /* Main.storyboard */; };
 		8B9E54981E2F810300AF9F55 /* D11.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E54961E2F810300AF9F55 /* D11.xcdatamodeld */; };
@@ -19,14 +16,13 @@
 		8B9E549D1E2F810300AF9F55 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B9E549B1E2F810300AF9F55 /* LaunchScreen.storyboard */; };
 		8B9E54A51E2F819600AF9F55 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E54A41E2F819600AF9F55 /* MainController.swift */; };
 		8B9E54A71E2F81AA00AF9F55 /* AddOrEditController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9E54A61E2F81AA00AF9F55 /* AddOrEditController.swift */; };
+		8BE6BD4B1E54A5B100CFD720 /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE6BD4A1E54A5B100CFD720 /* PreferencesController.swift */; };
+		8BE6BD4D1E54A6C500CFD720 /* SwipeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE6BD4C1E54A6C500CFD720 /* SwipeCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		13A5115BF8F1FCCF907DB355 /* Pods-D11.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-D11.release.xcconfig"; path = "Pods/Target Support Files/Pods-D11/Pods-D11.release.xcconfig"; sourceTree = "<group>"; };
-		8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatViewController.swift; sourceTree = "<group>"; };
 		8B36DBAC1E2F859D00C0E22B /* Tools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tools.swift; sourceTree = "<group>"; };
-		8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCell.swift; sourceTree = "<group>"; };
-		8B56BB201E4B8EA700FF8198 /* RepeatController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatController.swift; sourceTree = "<group>"; };
 		8B9E548C1E2F810300AF9F55 /* D11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = D11.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8B9E54941E2F810300AF9F55 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -36,6 +32,8 @@
 		8B9E549E1E2F810300AF9F55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B9E54A41E2F819600AF9F55 /* MainController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
 		8B9E54A61E2F81AA00AF9F55 /* AddOrEditController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddOrEditController.swift; sourceTree = "<group>"; };
+		8BE6BD4A1E54A5B100CFD720 /* PreferencesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
+		8BE6BD4C1E54A6C500CFD720 /* SwipeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeCell.swift; sourceTree = "<group>"; };
 		BC487AD705B4DCE34070A2E2 /* Pods_D11.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_D11.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC0761D8758232F9B454D0CD /* Pods-D11.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-D11.debug.xcconfig"; path = "Pods/Target Support Files/Pods-D11/Pods-D11.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -76,12 +74,11 @@
 				8B9E548F1E2F810300AF9F55 /* AppDelegate.swift */,
 				8B9E54A41E2F819600AF9F55 /* MainController.swift */,
 				8B9E54A61E2F81AA00AF9F55 /* AddOrEditController.swift */,
-				8B335BCA1E48C78E00ACC158 /* RepeatViewController.swift */,
-				8B56BB201E4B8EA700FF8198 /* RepeatController.swift */,
+				8BE6BD4A1E54A5B100CFD720 /* PreferencesController.swift */,
 				8B9E54931E2F810300AF9F55 /* Main.storyboard */,
 				8B9E54991E2F810300AF9F55 /* Assets.xcassets */,
 				8B36DBAC1E2F859D00C0E22B /* Tools.swift */,
-				8B4C21AF1E4E34B5008E759B /* SwipeCell.swift */,
+				8BE6BD4C1E54A6C500CFD720 /* SwipeCell.swift */,
 				8B9E549B1E2F810300AF9F55 /* LaunchScreen.storyboard */,
 				8B9E549E1E2F810300AF9F55 /* Info.plist */,
 				8B9E54961E2F810300AF9F55 /* D11.xcdatamodeld */,
@@ -230,13 +227,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B335BCB1E48C78E00ACC158 /* RepeatViewController.swift in Sources */,
 				8B9E54A51E2F819600AF9F55 /* MainController.swift in Sources */,
-				8B4C21B01E4E34B5008E759B /* SwipeCell.swift in Sources */,
+				8BE6BD4D1E54A6C500CFD720 /* SwipeCell.swift in Sources */,
+				8BE6BD4B1E54A5B100CFD720 /* PreferencesController.swift in Sources */,
 				8B9E54901E2F810300AF9F55 /* AppDelegate.swift in Sources */,
 				8B9E54981E2F810300AF9F55 /* D11.xcdatamodeld in Sources */,
 				8B36DBAD1E2F859D00C0E22B /* Tools.swift in Sources */,
-				8B56BB211E4B8EA700FF8198 /* RepeatController.swift in Sources */,
 				8B9E54A71E2F81AA00AF9F55 /* AddOrEditController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

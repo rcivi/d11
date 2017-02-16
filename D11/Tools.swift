@@ -86,3 +86,22 @@ struct Result {
 	}
 }
 
+// MARK: - PREFERENCES VARIABLES
+
+var colloquialIsOn: Bool = false
+var normalColor: UIColor = .black
+var attentionColor: UIColor = .orange
+var alarmColor: UIColor = .red
+var titleFontSize: Float = 20
+var detailFontSize: Float = 13
+
+
+enum PrefsKey: String {
+	case colloquialKey = "colloquial"
+	case normalColorKey = "normalColor"
+	case attentioncolorKey = "attentionColor"
+	case alertColorKey = "alertColor"
+	case titleFontSizeKey = "titleFontSize"
+	case detailFontSizeKey = "detailFontSize"
+}
+

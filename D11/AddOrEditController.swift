@@ -53,15 +53,15 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	var theNotifyQuantity: Int = 0
 	var theNotifyMode: Int = 0
 	
-	let repeats: [String] = ["never", "hour", "day", "week", "month", "quarter", "year"]
-	let repeatsPlurals: [String] = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
-	let endRepatMenu: [String] = ["never", "after"]
+	let repeats: [String]               = ["never", "hour", "day", "week", "month", "quarter", "year"]
+	let repeatsPlurals: [String]        = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
+	let endRepatMenu: [String]          = ["never", "after"]
 
-	let notifyTypeMenu: [String] = 	["never", "hour", "day", "week", "month", "quarter", "year"]
-	let notifyTypeMenuPlurals: [String] = 	["never", "hours", "days", "weeks", "months", "quarters", "years"]
-	let notifyModeMenu: [String] = ["before", "after"]
+	let notifyTypeMenu: [String]        = ["never", "hour", "day", "week", "month", "quarter", "year"]
+	let notifyTypeMenuPlurals: [String] = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
+	let notifyModeMenu: [String]        = ["before", "after"]
 
-	var activeRowInComp1: Int = 0
+//	var activeRowInComp1: Int = 0
 	let maxNumberOfCases: Int = 99
 
 
@@ -428,22 +428,22 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	@IBAction func allDaySwitchClicked(_ sender: Any) {
 
-		var result = ""
-		guard let dateString = dateLabel.text else { return }
-
-		if allDaySwitch.isOn {
-			if let date = dateAndTimeFormatter.date(from: dateString) {
-				result = dateOnlyFormatter.string(from: date)
-				datePicker.datePickerMode = .date
-			}
-		} else {
-			if let date = dateOnlyFormatter.date(from: dateString) {
-				result = dateAndTimeFormatter.string(from: date)
-				datePicker.datePickerMode = .dateAndTime
-			}
-		}
-
-		dateLabel.text = result
+//		var result = ""
+//		guard let dateString = dateLabel.text else { return }
+//
+//		if allDaySwitch.isOn {
+//			if let date = dateAndTimeFormatter.date(from: dateString) {
+//				result = dateOnlyFormatter.string(from: date)
+//				datePicker.datePickerMode = .date
+//			}
+//		} else {
+//			if let date = dateOnlyFormatter.date(from: dateString) {
+//				result = dateAndTimeFormatter.string(from: date)
+//				datePicker.datePickerMode = .dateAndTime
+//			}
+//		}
+//
+//		dateLabel.text = result
 	}
 
 	func syncDateAndTimePickers() {
