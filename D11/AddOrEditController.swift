@@ -73,7 +73,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		super.viewDidLoad()
 
 
-		//		 Removes empty lines in the table
+		// Removes empty lines in the table
 		addOrEditTable.tableFooterView = UIView()
 
 		// To dismiss keyboard after a tap outside
@@ -118,6 +118,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			allDaySwitch.setOn(true, animated: true)
 
 			theDate = Date()
+			titleTextField.becomeFirstResponder()
 		}
 
 
