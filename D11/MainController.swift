@@ -13,7 +13,7 @@ import UserNotifications
 import Fakery
 
 
-class EventCell: SwipeCell {
+class EventCell: UITableViewCell {
 
 	@IBOutlet weak var titleLabel: UILabel!
 	@IBOutlet weak var detail1Label: UILabel!
@@ -80,9 +80,10 @@ class MainController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-		let cell = tableView.dequeueReusableCell(withIdentifier: "EventCellIdentifier", for: indexPath)  as! EventCell
+		let cell = tableView.dequeueReusableCell(withIdentifier: "EventCellIdentifier", for: indexPath) as! EventCell
 
-//		cell.swipeDelegate = self
+
+
 
 		let today = Date()
 		let ev = events[indexPath.row]
@@ -126,29 +127,6 @@ class MainController: UITableViewController {
 		let notificationDate = getNotificationDate(date: newDate, notifyType: nt, notifyQuantity: nq, notifyMode: nm)
 		cell.detail1Label.textColor = getTextLabelColor(notifyMode: nm, notificationDate: notificationDate, eventDate: newDate)
 
-
-		// SWIPE RIGHT1 TO DELETE
-		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.right1, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "cross")), color: .red) { (cell) -> () in
-			self.deleteCell(cell: cell)
-		}
-
-		//		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.right2, swipeMode: SwipeCell.SwipeMode.bounce, icon: UIImageView(image: UIImage(named: "list")), color: .blue) { (cell) -> () in
-		//			self.deleteCell(cell: cell)
-		//		}
-		//		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.right3, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "clock")), color: .orange) { (cell) -> () in
-		//			self.deleteCell(cell: cell)
-		//		}
-		//		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.right4, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "check")), color: .green) { (cell) -> () in
-		//			self.deleteCell(cell: cell)
-		//		}
-
-
-		// SWIPE LEFT TO EDIT
-		cell.addSwipeGesture(swipeGesture: SwipeCell.SwipeGesture.left1, swipeMode: SwipeCell.SwipeMode.slide, icon: UIImageView(image: UIImage(named: "pencil")), color: .orange) { (cell) -> () in
-			self.editCell(cell: cell)
-		}
-
-		cell.swipeDelegate = self
 
 		return cell
 	}
@@ -391,54 +369,6 @@ class MainController: UITableViewController {
 		debugPrint(event.repeatQuantity, terminator: " \n ")
 	}
 
-
-	// MARK: - SWIPE OPTIONAL DELEGATE METHODS
-
-	override func swipeTableViewCellDidStartSwiping(cell: UITableViewCell) {}
-	override func swipeTableViewCellDidEndSwiping(cell: UITableViewCell) {}
-	override func swipeTableViewCell(cell: UITableViewCell, didSwipeWithPercentage percentage: CGFloat) {}
-
-
-	// MARK: - SWIPE HELPER METHODS
-
-	func deleteCell(cell: UITableViewCell) {
-
-		tableView.beginUpdates()
-
-		do {
-			let row = (self.tableView.indexPath(for: cell)?.row)!
-			context.delete(events[row])
-			try context.save()
-			loadEvents()
-			debugPrint("Deleting cell number \(row)")
-		} catch let error { debugPrint("3·\(error)") }
-
-		tableView.deleteRows(at: [self.tableView.indexPath(for: cell)!], with: .fade)
-		tableView.endUpdates()
-	}
-
-	func editCell(cell: UITableViewCell) {
-
-		tableView.beginUpdates()
-
-		performSegue(withIdentifier: "addOrEditSegue", sender: cell)
-
-		tableView.endUpdates()
-	}
-
-
-	// MARK: - optional swipe delegates
-
-//	func tableViewCellDidStartSwiping(cell cell: UITableViewCell) {
-//	}
-
-//	func tableViewCellDidEndSwiping(cell: UITableViewCell) {
-//
-//		eventsTable.reloadData()
-//	}
-
-//	func tableViewCell(cell cell: UITableViewCell, didSwipeWithPercentage percentage: CGFloat) {
-//	}
 
 
 	// MARK: - SEGUE
