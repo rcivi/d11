@@ -196,34 +196,34 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		tableView.beginUpdates()
 
 		if indexPath.section == 1 && indexPath.row == 1 {
-			datePickerIsVisible = !datePickerIsVisible
+			datePickerIsVisible.toggle()
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
 			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 1 && indexPath.row == 3 {
-			timePickerIsVisible = !timePickerIsVisible
+			timePickerIsVisible.toggle()
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
 			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 2 && indexPath.row == 0 {
 			// REPEAT CELL CLICKED
-			repeatPickerIsVisible = !repeatPickerIsVisible
+			repeatPickerIsVisible.toggle()
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
 			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 2 && indexPath.row == 2 {
 			// END REPEAT CELL CLICKED
-			endRepeatPickerIsVisible = !endRepeatPickerIsVisible
+			endRepeatPickerIsVisible.toggle()
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if timePickerIsVisible { timePickerIsVisible = false }
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 			if notifyPickerIsVisible { notifyPickerIsVisible = false }
 		} else if indexPath.section == 3 && indexPath.row == 0 {
 			// NOTIFY CELL CLICKED
-			notifyPickerIsVisible = !notifyPickerIsVisible
+			notifyPickerIsVisible.toggle()
 			if endRepeatPickerIsVisible { endRepeatPickerIsVisible = false }
 			if datePickerIsVisible { datePickerIsVisible = false }
 			if timePickerIsVisible { timePickerIsVisible = false }

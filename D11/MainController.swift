@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import SwiftDate
 import UserNotifications
+import Fakery
 
 
 class EventCell: SwipeCell {
@@ -81,13 +82,13 @@ class MainController: UITableViewController {
 
 		let cell = tableView.dequeueReusableCell(withIdentifier: "EventCellIdentifier", for: indexPath)  as! EventCell
 
-		cell.swipeDelegate = self
+//		cell.swipeDelegate = self
 
 		let today = Date()
 		let ev = events[indexPath.row]
 
-		print("EVENTO APPENA CARICATO")
-		print(ev)
+//		print("EVENTO APPENA CARICATO")
+//		print(ev)
 
 		guard let tit = ev.value(forKey: "title") as? String else { print("Title error"); return cell }
 		guard let dt1 = ev.value(forKey: "date") as? Date else { print("Date error"); return cell }
@@ -147,9 +148,10 @@ class MainController: UITableViewController {
 			self.editCell(cell: cell)
 		}
 
+		cell.swipeDelegate = self
+
 		return cell
 	}
-
 
 
 	// MARK: - DATE MANAGEMENT
@@ -299,9 +301,9 @@ class MainController: UITableViewController {
 		deleteAllEvents()
 
 		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
-		let r2 = Result(action: .added, title: "Compleanno Bianca", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r3 = Result(action: .added, title: "Compleanno Clara", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r4 = Result(action: .added, title: "Compleanno Pietro", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
 		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
 		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
 		let r7 = Result(action: .added, title: "Evento con titolo molto lungo", date: Date())
@@ -314,6 +316,13 @@ class MainController: UITableViewController {
 		saveEventWithStruct(eventToSave: nil, res: r5)
 		saveEventWithStruct(eventToSave: nil, res: r6)
 		saveEventWithStruct(eventToSave: nil, res: r7)
+
+		let faker = Faker()
+		for _ in 1...15 {
+			let r = Result(action: .added, title: faker.team.name() , date: Date.random())
+			saveEventWithStruct(eventToSave: nil, res: r)
+		}
+
 
 	}
 	
@@ -417,14 +426,27 @@ class MainController: UITableViewController {
 		tableView.endUpdates()
 	}
 
+
+	// MARK: - optional swipe delegates
+
+//	func tableViewCellDidStartSwiping(cell cell: UITableViewCell) {
+//	}
+
+//	func tableViewCellDidEndSwiping(cell: UITableViewCell) {
+//
+//		eventsTable.reloadData()
+//	}
+
+//	func tableViewCell(cell cell: UITableViewCell, didSwipeWithPercentage percentage: CGFloat) {
+//	}
+
+
 	// MARK: - SEGUE
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
 		if segue.identifier == "addOrEditSegue" {
 
-			debugPrint("Preparing to leave the main controller")
-	
 			let navigationController = segue.destination as! UINavigationController
 			let destinationController = navigationController.topViewController as! AddOrEditController
 
@@ -462,7 +484,6 @@ class MainController: UITableViewController {
 
 	@IBAction func unwindToMainControllerFromPreferences(segue: UIStoryboardSegue) {
 
-		debugPrint("Unwind from Preferences")
 		loadPreferences()
 		eventsTable.reloadData()
 	}
@@ -491,8 +512,6 @@ class MainController: UITableViewController {
 //		var titleFontSize: Int = 20
 //		var detailFontSize: Int = 13
 
-
-
 //		let colloquialKey = "colloquial"
 //		let normalColorKey = "normalColor"
 //		let attentioncolorKey = "attentionColor"
@@ -501,27 +520,26 @@ class MainController: UITableViewController {
 //		let detailFontSizeKey = "detailFontSize"
 
 		let defaults = UserDefaults.standard
-		colloquialIsOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
 
-		//		let font = titleLabel.font.fontName
-		//		titleLabel.font = UIFont(name: font, size: size)
+		colloquialIsOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
+		animateTableIsOn = defaults.bool(forKey: PrefsKey.animateTableIsOnKey.rawValue)
 
 		titleFontSize = defaults.float(forKey: PrefsKey.titleFontSizeKey.rawValue)
 		if titleFontSize == 0.0 { titleFontSize = 20.0 }
 
 		detailFontSize = defaults.float(forKey: PrefsKey.detailFontSizeKey.rawValue)
 		if detailFontSize == 0.0 { detailFontSize = 13.0 }
-
 	}
 
 	// MARK: - TABLE ANIMATION
 
 	override func viewWillAppear(_ animated: Bool) {
 
-		animateTable()
+		if animateTableIsOn { animateTable() }
 	}
 
 	func animateTable() {
+
 		eventsTable.reloadData()
 
 		let cells = eventsTable.visibleCells
@@ -547,12 +565,11 @@ class MainController: UITableViewController {
 
 	func handleRefresh(refreshControl: UIRefreshControl) {
 
-		colloquialIsOn = !colloquialIsOn
+		colloquialIsOn.toggle()
 		let defaults = UserDefaults.standard
 		defaults.set(colloquialIsOn, forKey: PrefsKey.colloquialKey.rawValue)
 
 		self.eventsTable.reloadData()
 		refreshControl.endRefreshing()
 	}
-
 }

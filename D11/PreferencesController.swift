@@ -11,6 +11,7 @@ import UIKit
 class PreferencesController: UIViewController {
 
 	@IBOutlet weak var colloquialSwitch: UISwitch!
+	@IBOutlet weak var animationSwitch: UISwitch!
 	@IBOutlet weak var titleSlider: UISlider!
 	@IBOutlet weak var detailSlider: UISlider!
 
@@ -22,6 +23,7 @@ class PreferencesController: UIViewController {
 
   		let defaults = UserDefaults.standard
 		colloquialSwitch.isOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
+		animationSwitch.isOn = defaults.bool(forKey: PrefsKey.animateTableIsOnKey.rawValue)
 		titleSlider.value = defaults.value(forKey: PrefsKey.titleFontSizeKey.rawValue) as? Float ?? 20.0
 		detailSlider.value = defaults.value(forKey: PrefsKey.detailFontSizeKey.rawValue) as? Float ?? 13.0
     }
@@ -63,6 +65,7 @@ class PreferencesController: UIViewController {
 
 		let defaults = UserDefaults.standard
 		defaults.set(colloquialSwitch.isOn, forKey: PrefsKey.colloquialKey.rawValue)
+		defaults.set(animationSwitch.isOn, forKey: PrefsKey.animateTableIsOnKey.rawValue)
 		defaults.setValue(titleSlider.value, forKey: PrefsKey.titleFontSizeKey.rawValue)
 		defaults.setValue(detailSlider.value, forKey: PrefsKey.detailFontSizeKey.rawValue)
 	}

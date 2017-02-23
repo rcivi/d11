@@ -29,18 +29,18 @@ var dateAndTimeFormatter: DateFormatter {
 }
 
 enum Every: Int {
-	case never = 0
-	case hour = 1
-	case day   = 2
-	case week  = 3
-	case month = 4
+	case never   = 0
+	case hour    = 1
+	case day     = 2
+	case week    = 3
+	case month   = 4
 	case quarter = 5
-	case year  = 6
+	case year    = 6
 }
 
 enum Mode: Int {
 	case before = 0
-	case after = 1
+	case after  = 1
 }
 
 enum ActionToReturn {
@@ -50,9 +50,9 @@ enum ActionToReturn {
 }
 
 enum PickerTag: Int {
-	case repeatTag = 1
+	case repeatTag    = 1
 	case endRepeatTag = 2
-	case notifyTag = 3
+	case notifyTag    = 3
 }
 
 
@@ -72,36 +72,88 @@ struct Result {
 
 	
 	init(action: ActionToReturn, title: String, date: Date, allday: Bool = true, repeatType: Int = 0, repeatQuantity: Int = 0, endRepeatType: Int = 0, endRepeatQuantity: Int = 0, notifyType: Int = 0, notifyQuantity: Int = 0, notifyMode: Int = 0) {
-		self.action = action
-		self.title = title
-		self.date = date
-		self.allday = allday
-		self.repeatType = repeatType
-		self.repeatQuantity = repeatQuantity
-		self.endRepeatType = endRepeatType
+
+		self.action            = action
+		self.title             = title
+		self.date              = date
+		self.allday            = allday
+		self.repeatType        = repeatType
+		self.repeatQuantity    = repeatQuantity
+		self.endRepeatType     = endRepeatType
 		self.endRepeatQuantity = endRepeatQuantity
-		self.notifyType = notifyType
-		self.notifyQuantity = notifyQuantity
-		self.notifyMode = notifyMode
+		self.notifyType        = notifyType
+		self.notifyQuantity    = notifyQuantity
+		self.notifyMode        = notifyMode
 	}
 }
 
 // MARK: - PREFERENCES VARIABLES
 
-var colloquialIsOn: Bool = false
-var normalColor: UIColor = .black
+var colloquialIsOn: Bool    = false
+var normalColor: UIColor    = .black
 var attentionColor: UIColor = .orange
-var alarmColor: UIColor = .red
-var titleFontSize: Float = 20
-var detailFontSize: Float = 13
+var alarmColor: UIColor     = .red
+var titleFontSize: Float    = 20
+var detailFontSize: Float   = 13
+var animateTableIsOn: Bool  = true
 
 
 enum PrefsKey: String {
-	case colloquialKey = "colloquial"
-	case normalColorKey = "normalColor"
-	case attentioncolorKey = "attentionColor"
-	case alertColorKey = "alertColor"
-	case titleFontSizeKey = "titleFontSize"
-	case detailFontSizeKey = "detailFontSize"
+	case colloquialKey       = "colloquial"
+	case normalColorKey      = "normalColor"
+	case attentioncolorKey   = "attentionColor"
+	case alertColorKey       = "alertColor"
+	case titleFontSizeKey    = "titleFontSize"
+	case detailFontSizeKey   = "detailFontSize"
+	case animateTableIsOnKey = "animateTableIsOn"
 }
 
+extension Bool {
+	/// EZSE: Converts Bool to Int.
+	public var toInt: Int { return self ? 1 : 0 }
+
+	/// EZSE: Toggle boolean value.
+	@discardableResult
+	public mutating func toggle() -> Bool {
+		self = !self
+		return self
+	}
+
+	/// EZSE: Return inverted value of bool.
+	public var toggled: Bool {
+		return !self
+	}
+}
+
+
+public extension Date {
+	/// SwiftRandom extension
+	public static func randomWithinDaysBeforeToday(_ days: Int) -> Date {
+		let today = Date()
+		let gregorian = Calendar(identifier: Calendar.Identifier.gregorian)
+
+		let r1 = arc4random_uniform(UInt32(days))
+		let r2 = arc4random_uniform(UInt32(23))
+		let r3 = arc4random_uniform(UInt32(59))
+		let r4 = arc4random_uniform(UInt32(59))
+
+		var offsetComponents = DateComponents()
+		offsetComponents.day = Int(r1) * -1
+		offsetComponents.hour = Int(r2)
+		offsetComponents.minute = Int(r3)
+		offsetComponents.second = Int(r4)
+
+		guard let rndDate1 = gregorian.date(byAdding: offsetComponents, to: today) else {
+			print("randoming failed")
+			return today
+		}
+		return rndDate1
+	}
+
+	/// SwiftRandom extension
+	public static func random() -> Date {
+		let randomTime = TimeInterval(arc4random_uniform(UInt32.max))
+		return Date(timeIntervalSince1970: randomTime)
+	}
+
+}
