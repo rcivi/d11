@@ -11,9 +11,10 @@ import CoreData
 import SwiftDate
 import UserNotifications
 import Fakery
+import MGSwipeTableCell
 
 
-class EventCell: UITableViewCell {
+class EventCell: MGSwipeTableCell {
 
 	@IBOutlet weak var titleLabel: UILabel!
 	@IBOutlet weak var detail1Label: UILabel!
@@ -23,7 +24,7 @@ class EventCell: UITableViewCell {
 
 
 
-class MainController: UITableViewController {
+class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	@IBOutlet var eventsTable: UITableView!
 
@@ -57,12 +58,9 @@ class MainController: UITableViewController {
 		let appDelegate = UIApplication.shared.delegate as! AppDelegate
 		managedObjectContext = appDelegate.persistentContainer.viewContext
 
-//		self.refreshControl?.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControlEvents.valueChanged)
-
 		self.refreshControl?.addTarget(self, action: #selector(MainController.handleRefresh) , for: UIControlEvents.valueChanged)
 
 		createInitialRecords()
-
 		loadPreferences()
 		loadEvents()
     }
@@ -75,15 +73,15 @@ class MainController: UITableViewController {
 	// MARK: - TABLE VIEW DATA SOURCE
 
 	override func numberOfSections(in tableView: UITableView) -> Int { return 1 }
-
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return events.count }
+
+
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
 		let cell = tableView.dequeueReusableCell(withIdentifier: "EventCellIdentifier", for: indexPath) as! EventCell
 
-
-
+		cell.delegate = self
 
 		let today = Date()
 		let ev = events[indexPath.row]
@@ -111,6 +109,7 @@ class MainController: UITableViewController {
 		let debugString = "\(tit), \(colloquial) - DB: \(dt1) - Rpt: \(newDate) - (T\(evrN),Q\(evrQN),ER\(erq)) - Now: \(today)"
 		debugPrint(debugString)
 
+
 		cell.titleLabel.text = tit
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)   // "\(newDate)"
 		cell.detail2Label.text = ""
@@ -123,13 +122,34 @@ class MainController: UITableViewController {
 		let size1 = NSNumber(value: Double(detailFontSize))
 		cell.detail1Label.font = UIFont(name: font1, size: CGFloat(size1))
 
-
 		let notificationDate = getNotificationDate(date: newDate, notifyType: nt, notifyQuantity: nq, notifyMode: nm)
 		cell.detail1Label.textColor = getTextLabelColor(notifyMode: nm, notificationDate: notificationDate, eventDate: newDate)
 
 
+		//configure swipe left buttons
+		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named:"pencil.png"), backgroundColor: UIColor.green, padding: 30, callback: {
+			(cell) -> Bool in
+			print("swipe here")
+
+			return true
+		})
+		cell.leftButtons = [cellButton1]
+		cell.leftSwipeSettings.transition = MGSwipeTransition.static
+
+		//configure swipe right buttons
+		let rightButton1 = MGSwipeButton(title: "", icon: UIImage(named:"cross.png"), backgroundColor: UIColor.red, padding: 30, callback: {
+			(cell) -> Bool in
+			print("swipe here too")
+
+			return true
+		})
+		cell.rightButtons = [rightButton1]
+		cell.rightSwipeSettings.transition = MGSwipeTransition.static
+
+
 		return cell
 	}
+
 
 
 	// MARK: - DATE MANAGEMENT

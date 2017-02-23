@@ -149,9 +149,9 @@
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="detail1Label" destination="NkJ-gF-fBo" id="VNR-jz-OQb"/>
-                                    <outlet property="detail2Label" destination="vuM-f8-QS9" id="LTO-aJ-iIs"/>
-                                    <outlet property="titleLabel" destination="8MK-Ai-DeN" id="8QZ-iv-9ZO"/>
+                                    <outlet property="detail1Label" destination="NkJ-gF-fBo" id="7ZN-xw-qoe"/>
+                                    <outlet property="detail2Label" destination="vuM-f8-QS9" id="Pfz-EK-GRw"/>
+                                    <outlet property="titleLabel" destination="8MK-Ai-DeN" id="nvn-J6-7QK"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
