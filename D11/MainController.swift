@@ -86,17 +86,12 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let today = Date()
 		let ev = events[indexPath.row]
 
-//		print("EVENTO APPENA CARICATO")
-//		print(ev)
-
 		guard let tit = ev.value(forKey: "title") as? String else { print("Title error"); return cell }
 		guard let dt1 = ev.value(forKey: "date") as? Date else { print("Date error"); return cell }
 		guard let evrN = ev.value(forKey: "repeatType") as? Int else { print("Every Type error"); return cell }
 		guard let evrQN = ev.value(forKey: "repeatQuantity") as? Int else { print("Every Quantity error"); return cell }
-
 		guard let ert = ev.value(forKey: "endRepeatType") as? Int else { print("Repeat Type error"); return cell }
 		guard let erq = ev.value(forKey: "endRepeatQuantity") as? Int else { print("Repeat Quantity Type error"); return cell }
-
 		guard let nt = ev.value(forKey: "notifyType") as? Int else { print("Repeat Type error"); return cell }
 		guard let nq = ev.value(forKey: "notifyQuantity") as? Int else { print("Repeat Type error"); return cell }
 		guard let nm = ev.value(forKey: "notifyMode") as? Int else { print("Repeat Type error"); return cell }
@@ -129,25 +124,55 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		//configure swipe left buttons
 		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named:"pencil.png"), backgroundColor: UIColor.green, padding: 30, callback: {
 			(cell) -> Bool in
-			print("swipe here")
-
+			self.editCell(cell: cell)
 			return true
 		})
 		cell.leftButtons = [cellButton1]
 		cell.leftSwipeSettings.transition = MGSwipeTransition.static
+		cell.leftExpansion.buttonIndex = 0
+		cell.leftExpansion.fillOnTrigger = true
+		cell.leftExpansion.threshold = 2
 
+		
 		//configure swipe right buttons
 		let rightButton1 = MGSwipeButton(title: "", icon: UIImage(named:"cross.png"), backgroundColor: UIColor.red, padding: 30, callback: {
 			(cell) -> Bool in
-			print("swipe here too")
-
+			self.deleteCell(cell: cell)
 			return true
 		})
 		cell.rightButtons = [rightButton1]
 		cell.rightSwipeSettings.transition = MGSwipeTransition.static
+		cell.rightExpansion.buttonIndex = 0
+		cell.rightExpansion.fillOnTrigger = true
+		cell.rightExpansion.threshold = 2
 
 
 		return cell
+	}
+
+	// MARK: - SWIPE HELPER METHODS
+
+	func deleteCell(cell: UITableViewCell) {
+
+		tableView.beginUpdates()
+
+		do {
+			let row = (self.tableView.indexPath(for: cell)?.row)!
+			context.delete(events[row])
+			try context.save()
+			loadEvents()
+			debugPrint("Deleting cell number \(row)")
+		} catch let error { debugPrint("3·\(error)") }
+
+		tableView.deleteRows(at: [self.tableView.indexPath(for: cell)!], with: .fade)
+		tableView.endUpdates()
+	}
+
+	func editCell(cell: UITableViewCell) {
+
+		tableView.beginUpdates()
+		performSegue(withIdentifier: "addOrEditSegue", sender: cell)
+		tableView.endUpdates()
 	}
 
 
