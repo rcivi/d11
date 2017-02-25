@@ -546,6 +546,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		defaults.set(colloquialIsOn, forKey: PrefsKey.colloquialKey.rawValue)
 
 		self.eventsTable.reloadData()
+//		animateTable()
 		refreshControl.endRefreshing()
 	}
 
