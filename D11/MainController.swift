@@ -107,9 +107,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		let (newDate, colloquial) = dateDistanceFromNow(toDate: dt1, repeatType: evr, repeatQuantity: evrQN, endRepeatType: ert, endRepeatQuantity: erq)
 
-		let debugString = "\(tit), \(colloquial) - DB: \(dt1) - Rpt: \(newDate) - (T\(evrN),Q\(evrQN),ER\(erq)) - Now: \(today)"
-		debugPrint(debugString)
-
+//		let debugString = "\(tit), \(colloquial) - DB: \(dt1) - Rpt: \(newDate) - (T\(evrN),Q\(evrQN),ER\(erq)) - Now: \(today)"
+//		debugPrint(debugString)
 
 		cell.titleLabel.text = tit
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
