@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Fakery
+
 
 class PreferencesController: UIViewController {
 
@@ -68,5 +70,27 @@ class PreferencesController: UIViewController {
 		defaults.set(animationSwitch.isOn, forKey: PrefsKey.animateTableIsOnKey.rawValue)
 		defaults.setValue(titleSlider.value, forKey: PrefsKey.titleFontSizeKey.rawValue)
 		defaults.setValue(detailSlider.value, forKey: PrefsKey.detailFontSizeKey.rawValue)
+		defaults.set(SortEventsBy.date.rawValue, forKey: PrefsKey.sortEventsByKey.rawValue)
 	}
+
+	@IBAction func generateFakeDataButtonPressed(_ sender: Any) {
+
+		let alert = UIAlertController()
+
+		alert.addAction(UIAlertAction(title: "Title", style: .default, handler: { (action) in
+			print("Title")
+		}))
+
+
+		alert.addAction(UIAlertAction(title: "Date", style: .default, handler: { (action) in
+			print("Date")
+		}))
+
+		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+			print("cancel")
+		}))
+
+		self.present(alert, animated: true, completion: nil)
+	}
+	
 }

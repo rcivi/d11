@@ -33,6 +33,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	var badgeCount: Int = 0
 	var events = [Event]()
+	var sortEventsBy: SortEventsBy = SortEventsBy.date
 
 
 	var dateFormatter: DateFormatter {
@@ -63,6 +64,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		createInitialRecords()
 		loadPreferences()
 		loadEvents()
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -86,15 +88,20 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let today = Date()
 		let ev = events[indexPath.row]
 
-		guard let tit = ev.value(forKey: "title") as? String else { print("Title error"); return cell }
-		guard let dt1 = ev.value(forKey: "date") as? Date else { print("Date error"); return cell }
-		guard let evrN = ev.value(forKey: "repeatType") as? Int else { print("Every Type error"); return cell }
-		guard let evrQN = ev.value(forKey: "repeatQuantity") as? Int else { print("Every Quantity error"); return cell }
-		guard let ert = ev.value(forKey: "endRepeatType") as? Int else { print("Repeat Type error"); return cell }
-		guard let erq = ev.value(forKey: "endRepeatQuantity") as? Int else { print("Repeat Quantity Type error"); return cell }
-		guard let nt = ev.value(forKey: "notifyType") as? Int else { print("Repeat Type error"); return cell }
-		guard let nq = ev.value(forKey: "notifyQuantity") as? Int else { print("Repeat Type error"); return cell }
-		guard let nm = ev.value(forKey: "notifyMode") as? Int else { print("Repeat Type error"); return cell }
+		guard
+			let tit   = ev.value(forKey: "title") as? String,
+			let dt1   = ev.value(forKey: "date") as? Date,
+			let evrN  = ev.value(forKey: "repeatType") as? Int,
+			let evrQN = ev.value(forKey: "repeatQuantity") as? Int,
+			let ert   = ev.value(forKey: "endRepeatType") as? Int,
+			let erq   = ev.value(forKey: "endRepeatQuantity") as? Int,
+			let nt    = ev.value(forKey: "notifyType") as? Int,
+			let nq    = ev.value(forKey: "notifyQuantity") as? Int,
+			let nm    = ev.value(forKey: "notifyMode") as? Int
+			else {
+				print("Type error")
+				return cell
+		}
 
 
 		let evr = Every(rawValue: evrN)!
@@ -106,7 +113,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 
 		cell.titleLabel.text = tit
-		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)   // "\(newDate)"
+		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
 		cell.detail2Label.text = ""
 
 		let font = cell.titleLabel.font.fontName
@@ -213,10 +220,10 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	func getNotificationDate(date: Date, notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> Date {
 
-		var notificationDate = date
+		var notificationDate     = date
 		let notificationQuantity = notifyQuantity + 1
-		let notificationType = Every(rawValue: notifyType)!
-		let notificationMode = Mode(rawValue: notifyMode)!
+		let notificationType     = Every(rawValue: notifyType)!
+		let notificationMode     = Mode(rawValue: notifyMode)!
 
 		switch(notificationType) {
 
@@ -282,8 +289,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	func rollDate(startDate: Date, repeatType: Every, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) -> Date {
 
-		var newDate = startDate
-		let rquantity = repeatQuantity + 1 // To change from position to value
+		var newDate    = startDate
+		let rquantity  = repeatQuantity + 1 // To change from position to value
 		let erquantity = endRepeatType == 0 ? 0 : endRepeatQuantity
 
 		var countRepetitions = 0
@@ -350,7 +357,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 	}
 	
 
-	func saveEventWithStruct(eventToSave: Event?, res: Result) {
+	public func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
 		let event: Event = eventToSave != nil ? eventToSave! : Event(context: managedObjectContext!)
 		let date: Date =  res.date
@@ -360,14 +367,14 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		event.rolledDate = rollDate(startDate: date, repeatType: Every(rawValue: res.repeatType)!, repeatQuantity: res.repeatQuantity, endRepeatType: res.endRepeatType, endRepeatQuantity: res.endRepeatQuantity)  as NSDate?
 
-		event.allday = true
-		event.repeatType = Int32(res.repeatType)
-		event.repeatQuantity = Int32(res.repeatQuantity)
-		event.endRepeatType = Int32(res.endRepeatType)
+		event.allday            = true
+		event.repeatType        = Int32(res.repeatType)
+		event.repeatQuantity    = Int32(res.repeatQuantity)
+		event.endRepeatType     = Int32(res.endRepeatType)
 		event.endRepeatQuantity = Int32(res.endRepeatQuantity)
-		event.notifyType = Int32(res.notifyType)
-		event.notifyQuantity = Int32(res.notifyQuantity)
-		event.notifyMode = Int32(res.notifyMode)
+		event.notifyType        = Int32(res.notifyType)
+		event.notifyQuantity    = Int32(res.notifyQuantity)
+		event.notifyMode        = Int32(res.notifyMode)
 
 		do {
 			try managedObjectContext!.save()
@@ -396,7 +403,14 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		do {
 			let results = try managedObjectContext?.fetch(request)
-			events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
+
+			switch sortEventsBy {
+			case .date:
+				events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
+			case .title:
+				events = (results?.sorted(by: { $0.title! < $1.title!  }))!
+			}
+
 		} catch {
 			fatalError("Error in retrieving items")
 		}
@@ -439,8 +453,6 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let navigationController = segue.source as! AddOrEditController
 		guard let res = navigationController.theResult else { return }
 		
-//		print(res)
-
 		switch res.action {
 
 		case .canceled:
@@ -480,20 +492,6 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	func loadPreferences() {
 
-//		var colloquialIsOn: Bool = false
-//		var normalColor: UIColor = .black
-//		var attentionColor: UIColor = .orange
-//		var alarmColor: UIColor = .red
-//		var titleFontSize: Int = 20
-//		var detailFontSize: Int = 13
-
-//		let colloquialKey = "colloquial"
-//		let normalColorKey = "normalColor"
-//		let attentioncolorKey = "attentionColor"
-//		let alertColorKey = "alertColor"
-//		let titleFontSizeKey = "titleFontSize"
-//		let detailFontSizeKey = "detailFontSize"
-
 		let defaults = UserDefaults.standard
 
 		colloquialIsOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
@@ -504,6 +502,9 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		detailFontSize = defaults.float(forKey: PrefsKey.detailFontSizeKey.rawValue)
 		if detailFontSize == 0.0 { detailFontSize = 13.0 }
+
+		let sortType = SortEventsBy(rawValue: defaults.integer(forKey: PrefsKey.sortEventsByKey.rawValue))
+		sortEventsBy = sortType ?? SortEventsBy.date
 	}
 
 	// MARK: - TABLE ANIMATION

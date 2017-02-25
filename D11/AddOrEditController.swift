@@ -583,5 +583,4 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	}
 
-
 }

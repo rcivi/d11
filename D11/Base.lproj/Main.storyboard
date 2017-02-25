@@ -72,6 +72,14 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8uI-tn-bYI">
+                                <rect key="frame" x="16" y="305" width="155" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Generate Fake Data"/>
+                                <connections>
+                                    <action selector="generateFakeDataButtonPressed:" destination="Oew-6F-lo3" eventType="touchUpInside" id="82l-I8-On7"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
@@ -95,7 +103,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oQX-OM-Sve" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="V4N-fl-uUC" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="1041" y="-835"/>
+            <point key="canvasLocation" x="1040.8" y="-835.23238380809596"/>
         </scene>
         <!--The Date-->
         <scene sceneID="uHw-qT-bDB">
@@ -161,7 +169,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="The Date" id="CS7-EG-8ty">
-                        <barButtonItem key="leftBarButtonItem" image="more" id="epg-yA-Iwd">
+                        <barButtonItem key="leftBarButtonItem" image="gear" id="epg-yA-Iwd">
                             <connections>
                                 <segue destination="yDN-kL-Y8e" kind="presentation" identifier="preferencesSegue" modalTransitionStyle="coverVertical" id="O1Y-kw-9r7"/>
                             </connections>
@@ -302,7 +310,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" datePickerMode="date" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="ts9-AV-Hbw">
-                                                    <rect key="frame" x="-1" y="0.0" width="358" height="237"/>
+                                                    <rect key="frame" x="-2" y="0.0" width="357" height="237"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="506450268.49513799">
                                                         <!--2017-01-18 16:37:48 +0000-->
@@ -358,7 +366,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="fs7-id-c3w">
-                                                    <rect key="frame" x="-8" y="10" width="376" height="216"/>
+                                                    <rect key="frame" x="-10" y="10" width="376" height="216"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="506973494.13524801">
                                                         <!--2017-01-24 17:58:14 +0000-->
@@ -406,7 +414,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <pickerView tag="1" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ugT-MM-ubU">
-                                                    <rect key="frame" x="-5" y="0.0" width="377" height="216"/>
+                                                    <rect key="frame" x="-5" y="0.0" width="376" height="216"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <connections>
                                                         <outlet property="dataSource" destination="kFN-ch-PsB" id="JKB-xn-CJe"/>
@@ -448,7 +456,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <pickerView tag="2" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YzM-98-Geh">
-                                                    <rect key="frame" x="-1" y="0.0" width="373" height="216"/>
+                                                    <rect key="frame" x="-2" y="0.0" width="373" height="216"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <connections>
                                                         <outlet property="dataSource" destination="kFN-ch-PsB" id="Wgn-8C-6Pp"/>
@@ -494,7 +502,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <pickerView tag="3" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xbr-4u-DWb">
-                                                    <rect key="frame" x="-1" y="0.0" width="373" height="216"/>
+                                                    <rect key="frame" x="-2" y="0.0" width="373" height="216"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <connections>
                                                         <outlet property="dataSource" destination="kFN-ch-PsB" id="RZ7-w2-oo8"/>
@@ -605,6 +613,6 @@
     </scenes>
     <resources>
         <image name="back" width="10" height="17"/>
-        <image name="more" width="20" height="5"/>
+        <image name="gear" width="20" height="20"/>
     </resources>
 </document>

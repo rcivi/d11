@@ -97,6 +97,10 @@ var titleFontSize: Float    = 20
 var detailFontSize: Float   = 13
 var animateTableIsOn: Bool  = true
 
+enum SortEventsBy: Int {
+	case date = 0
+	case title = 1
+}
 
 enum PrefsKey: String {
 	case colloquialKey       = "colloquial"
@@ -106,6 +110,7 @@ enum PrefsKey: String {
 	case titleFontSizeKey    = "titleFontSize"
 	case detailFontSizeKey   = "detailFontSize"
 	case animateTableIsOnKey = "animateTableIsOn"
+	case sortEventsByKey     = "sortEventsBy"
 }
 
 extension Bool {
