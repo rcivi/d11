@@ -49,7 +49,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		// Working directory of the simulator
+//		Working directory of the simulator
 //		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
 //		print("Simulator working direcotry: \(dirPaths[0])")
 
@@ -64,7 +64,6 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		createInitialRecords()
 		loadPreferences()
 		loadEvents()
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -539,6 +538,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		}
 	}
 
+	// MARK: - PULL TO REFRESH
+
 	func handleRefresh(refreshControl: UIRefreshControl) {
 
 		colloquialIsOn.toggle()
@@ -547,5 +548,32 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		self.eventsTable.reloadData()
 		refreshControl.endRefreshing()
+	}
+
+	// MARK: - TOOLBAR
+
+	@IBAction func sortToolbarButtonPushed(_ sender: Any) {
+		
+		switch sortEventsBy {
+		case .date:
+			sortEventsBy = SortEventsBy.title
+		case .title:
+			sortEventsBy = SortEventsBy.date
+		}
+		
+		let defaults = UserDefaults.standard
+		defaults.set(SortEventsBy.date.rawValue, forKey: PrefsKey.sortEventsByKey.rawValue)
+
+		self.loadEvents()
+		self.animateTable()
+	}
+
+	@IBAction func calendarToolbarButtonPushed(_ sender: Any) {
+
+		colloquialIsOn.toggle()
+		let defaults = UserDefaults.standard
+		defaults.set(colloquialIsOn, forKey: PrefsKey.colloquialKey.rawValue)
+
+		self.animateTable()
 	}
 }
