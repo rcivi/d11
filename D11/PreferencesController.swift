@@ -2,60 +2,65 @@
 //  PreferencesController.swift
 //  D11
 //
-//  Created by Ruggero Civitarese on 15/02/17.
+//  Created by Ruggero Civitarese on 10/03/17.
 //  Copyright © 2017 Ruggero Civitarese. All rights reserved.
 //
 
 import UIKit
 import Fakery
 
-
-class PreferencesController: UIViewController {
+class PreferencesController: UITableViewController {
 
 	@IBOutlet weak var colloquialSwitch: UISwitch!
 	@IBOutlet weak var animationSwitch: UISwitch!
 	@IBOutlet weak var titleSlider: UISlider!
 	@IBOutlet weak var detailSlider: UISlider!
-
 	@IBOutlet weak var titleTextExampleLabel: UILabel!
 	@IBOutlet weak var detailTextExampleLabel: UILabel!
+
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-  		let defaults = UserDefaults.standard
+		let defaults = UserDefaults.standard
 		colloquialSwitch.isOn = defaults.bool(forKey: PrefsKey.colloquialKey.rawValue)
-		animationSwitch.isOn = defaults.bool(forKey: PrefsKey.animateTableIsOnKey.rawValue)
-		titleSlider.value = defaults.value(forKey: PrefsKey.titleFontSizeKey.rawValue) as? Float ?? 20.0
-		detailSlider.value = defaults.value(forKey: PrefsKey.detailFontSizeKey.rawValue) as? Float ?? 13.0
+		animationSwitch.isOn  = defaults.bool(forKey: PrefsKey.animateTableIsOnKey.rawValue)
+		titleSlider.value     = defaults.value(forKey: PrefsKey.titleFontSizeKey.rawValue) as? Float ?? 20.0
+		detailSlider.value    = defaults.value(forKey: PrefsKey.detailFontSizeKey.rawValue) as? Float ?? 13.0
+
+		let tsize = NSNumber(value: Double(titleSlider.value))
+		let tfont = titleTextExampleLabel.font.fontName
+		titleTextExampleLabel.font = UIFont(name: tfont, size: CGFloat(tsize))
+
+		let dsize = NSNumber(value: Double(detailSlider.value))
+		let dfont = detailTextExampleLabel.font.fontName
+		detailTextExampleLabel.font = UIFont(name: dfont, size: CGFloat(dsize))
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
 
-	@IBAction func titleSliderChanged(_ sender: Any) {
+    // MARK: - Table view data source
 
-		let slider = sender as! UISlider
-		slider.value = round(slider.value)
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
 
-		let size = NSNumber(value: Double(slider.value))
-		let font = titleTextExampleLabel.font.fontName
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		switch section {
+		case 0:
+			return 2
+		case 1:
+			return 2
+		case 2:
+			return 1
+		default:
+			return 0
+		}
+    }
 
-		titleTextExampleLabel.font = UIFont(name: font, size: CGFloat(size))
-	}
-
-	@IBAction func detailSlider(_ sender: Any) {
-
-		let slider = sender as! UISlider
-		slider.value = round(slider.value)
-
-		let size = NSNumber(value: Double(slider.value))
-		let font = detailTextExampleLabel.font.fontName
-
-		detailTextExampleLabel.font = UIFont(name: font, size: CGFloat(size))
-	}
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
@@ -71,6 +76,29 @@ class PreferencesController: UIViewController {
 		defaults.setValue(titleSlider.value, forKey: PrefsKey.titleFontSizeKey.rawValue)
 		defaults.setValue(detailSlider.value, forKey: PrefsKey.detailFontSizeKey.rawValue)
 		defaults.set(SortEventsBy.date.rawValue, forKey: PrefsKey.sortEventsByKey.rawValue)
+	}
+
+
+	@IBAction func titleSliderChanged(_ sender: Any) {
+
+		let slider = sender as! UISlider
+		slider.value = round(slider.value)
+
+		let size = NSNumber(value: Double(slider.value))
+		let font = titleTextExampleLabel.font.fontName
+
+		titleTextExampleLabel.font = UIFont(name: font, size: CGFloat(size))
+	}
+
+	@IBAction func detailSliderChanged(_ sender: Any) {
+
+		let slider = sender as! UISlider
+		slider.value = round(slider.value)
+
+		let size = NSNumber(value: Double(slider.value))
+		let font = detailTextExampleLabel.font.fontName
+
+		detailTextExampleLabel.font = UIFont(name: font, size: CGFloat(size))
 	}
 
 	@IBAction func generateFakeDataButtonPressed(_ sender: Any) {

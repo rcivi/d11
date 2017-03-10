@@ -72,7 +72,6 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-
 		// Removes empty lines in the table
 		addOrEditTable.tableFooterView = UIView()
 
@@ -187,6 +186,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		} else {
 			heigth = 44.0
 		}
+		if datePickerIsVisible { datePicker.setValue(UIColor.white, forKey: "textColor") }
+		if timePickerIsVisible { timePicker.setValue(UIColor.white, forKey: "textColor") }
+
 		return heigth
 	}
 
@@ -230,12 +232,11 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			if repeatPickerIsVisible { repeatPickerIsVisible = false }
 		}
 
-
-		if datePickerIsVisible { dateLabel.textColor = UIColor.red } else { dateLabel.textColor = UIColor.black }
-		if timePickerIsVisible { timeLabel.textColor = UIColor.red } else { timeLabel.textColor = UIColor.black }
-		if repeatPickerIsVisible { repeatLabel.textColor = UIColor.red } else { repeatLabel.textColor = UIColor.black }
-		if endRepeatPickerIsVisible { endRepeatLabel.textColor = UIColor.red } else { endRepeatLabel.textColor = UIColor.black }
-		if notifyPickerIsVisible { notifyLabel.textColor = UIColor.red } else { notifyLabel.textColor = UIColor.black }
+		if datePickerIsVisible { dateLabel.textColor = UIColor.red } else { dateLabel.textColor = UIColor.white }
+		if timePickerIsVisible { timeLabel.textColor = UIColor.red } else { timeLabel.textColor = UIColor.white }
+		if repeatPickerIsVisible { repeatLabel.textColor = UIColor.red } else { repeatLabel.textColor = UIColor.white }
+		if endRepeatPickerIsVisible { endRepeatLabel.textColor = UIColor.red } else { endRepeatLabel.textColor = UIColor.white }
+		if notifyPickerIsVisible { notifyLabel.textColor = UIColor.red } else { notifyLabel.textColor = UIColor.white }
 
 		addOrEditTable.reloadData()
 		tableView.endUpdates()
@@ -292,31 +293,41 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		return 0
 	}
 
-	func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
 
+	func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+
+		var res = ""
 		let tag = PickerTag(rawValue: pickerView.tag)!
+
 		switch tag {
 
 		case PickerTag.repeatTag:
-			if component == 0 { return theRepeatType == 0 ? "–" : String(row + 1) } else { return repeats[row] }
+			if component == 0 { res = theRepeatType == 0 ? "–" : String(row + 1) } else { res = repeats[row] }
 
 		case PickerTag.endRepeatTag:
 			if component == 0 {
-				return endRepatMenu[row]
+				res = endRepatMenu[row]
 			} else if component == 1 {
-				return theEndRepeatType == 0 ? "" : String(row + 1)
+				res = theEndRepeatType == 0 ? "" : String(row + 1)
 			} else {
-				return theEndRepeatType == 0 ? "" : theEndRepeatQuantity > 0 ? "times" : "time"
+				res = theEndRepeatType == 0 ? "" : theEndRepeatQuantity > 0 ? "times" : "time"
 			}
 		case PickerTag.notifyTag:
 			if component == 0 {
-				return theNotifyType == 0 ? "–" : String(row + 1)
+				res = theNotifyType == 0 ? "–" : String(row + 1)
 			} else if component == 1 {
-				return notifyTypeMenu[row]
+				res = notifyTypeMenu[row]
 			} else {
-				return notifyModeMenu[row]
+				res = notifyModeMenu[row]
 			}
 		}
+
+//		let fontName = titleTextField.font!.fontName
+//		let font = UIFont(name: fontName, size: CGFloat(12.0))
+
+		let attRes = NSAttributedString(string: res, attributes: [NSForegroundColorAttributeName: UIColor.white])
+
+		return attRes
 	}
 
 	func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
@@ -324,6 +335,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		let tag = PickerTag(rawValue: pickerView.tag)!
 
 		switch tag {
+
 		case PickerTag.repeatTag:
 			if component == 0 { return 50.0 } else { return 150.0 }
 		case PickerTag.endRepeatTag:
@@ -449,15 +461,15 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	func syncDateAndTimePickers() {
 
-		let d1 = datePicker.date
-		let d2 = timePicker.date
+		let d1                = datePicker.date
+		let d2                = timePicker.date
 
-		let year = d1.year
-		let month = d1.month
-		let day = d1.day
+		let year              = d1.year
+		let month             = d1.month
+		let day               = d1.day
 
-		let hour = d2.hour
-		let minute = d2.minute
+		let hour              = d2.hour
+		let minute            = d2.minute
 
 		let mergedDateAndTime = dateAndTimeFormatter.date(from: "\(day)-\(month)-\(year) \(hour):\(minute)")
 
@@ -502,17 +514,17 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		if sender is UIBarButtonItem {
 			debugPrint("Cancel or AddOrSave button pressed")
 
-			let clickedButton = sender as! UIBarButtonItem
-			let buttonTag = clickedButton.tag
+			let clickedButton     = sender as! UIBarButtonItem
+			let buttonTag         = clickedButton.tag
 
-			let repeatQuantity = repeatPicker.selectedRow(inComponent: 0)
-			let repeatType = repeatPicker.selectedRow(inComponent: 1)
-			let endRepeatType = endRepeatPicker.selectedRow(inComponent: 0)
+			let repeatQuantity    = repeatPicker.selectedRow(inComponent: 0)
+			let repeatType        = repeatPicker.selectedRow(inComponent: 1)
+			let endRepeatType     = endRepeatPicker.selectedRow(inComponent: 0)
 			let endRepeatQuantity = endRepeatPicker.selectedRow(inComponent: 1)
-			let title = titleTextField.text!.trimmingCharacters(in: .whitespaces)
-			let notifyType = notifyPicker.selectedRow(inComponent: 1)
-			let notifyQuantity = notifyPicker.selectedRow(inComponent: 0)
-			let notifyMode = notifyPicker.selectedRow(inComponent: 2)
+			let title             = titleTextField.text!.trimmingCharacters(in: .whitespaces)
+			let notifyType        = notifyPicker.selectedRow(inComponent: 1)
+			let notifyQuantity    = notifyPicker.selectedRow(inComponent: 0)
+			let notifyMode        = notifyPicker.selectedRow(inComponent: 2)
 			
 			var action: ActionToReturn
 
@@ -568,7 +580,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	func setupAddTargetIsNotEmptyTextFields() {
 
-		//		addOrSaveButton.isEnabled = false
+		// addOrSaveButton.isEnabled = false
 		titleTextField.addTarget(self, action: #selector(textFieldsIsNotEmpty), for: .editingChanged)
 	}
 
@@ -579,6 +591,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		}
 	}
 
+	// SERVE??????
 	@IBAction func unwindToAddOrEditController(unwindSegue: UIStoryboardSegue) {
 
 	}

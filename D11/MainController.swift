@@ -84,7 +84,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		cell.delegate = self
 
-		let today = Date()
+//		let today = Date()
 		let ev = events[indexPath.row]
 
 		guard
@@ -126,9 +126,11 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		cell.detail1Label.textColor = getTextLabelColor(notifyMode: nm, notificationDate: notificationDate, eventDate: newDate)
 
 
-		//configure swipe left buttons
-		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named:"pencil.png"), backgroundColor: UIColor.green, padding: 30, callback: {
+		// configure swipe left buttons
+		// green: 03B100
+		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named:"fat-pencil-90.png"), backgroundColor: UIColor.editSwipeBackground , padding: 30, callback: {
 			(cell) -> Bool in
+
 			self.editCell(cell: cell)
 			return true
 		})
@@ -142,6 +144,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		//configure swipe right buttons
 		let rightButton1 = MGSwipeButton(title: "", icon: UIImage(named:"cross.png"), backgroundColor: UIColor.red, padding: 30, callback: {
 			(cell) -> Bool in
+
 			self.deleteCell(cell: cell)
 			return true
 		})
@@ -154,6 +157,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		return cell
 	}
+
 
 	// MARK: - SWIPE HELPER METHODS
 
@@ -323,7 +327,6 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	// MARK: - CORE DATA MANAGEMENT
 
-
 	func createInitialRecords() {
 
 		deleteAllEvents()
@@ -486,7 +489,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		application.applicationIconBadgeNumber = badgeCount
 	}
 
-	// MArk: - LOAD PREFERENCES
+	// MARK: - LOAD PREFERENCES
 
 	func loadPreferences() {
 

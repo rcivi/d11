@@ -90,12 +90,13 @@ struct Result {
 // MARK: - PREFERENCES VARIABLES
 
 var colloquialIsOn: Bool    = false
-var normalColor: UIColor    = .black
+var normalColor: UIColor    = .white
 var attentionColor: UIColor = .orange
 var alarmColor: UIColor     = .red
 var titleFontSize: Float    = 20
 var detailFontSize: Float   = 13
 var animateTableIsOn: Bool  = true
+
 
 enum SortEventsBy: Int {
 	case date = 0
@@ -143,8 +144,8 @@ public extension Date {
 		let r4 = arc4random_uniform(UInt32(59))
 
 		var offsetComponents = DateComponents()
-		offsetComponents.day = Int(r1) * -1
-		offsetComponents.hour = Int(r2)
+		offsetComponents.day    = Int(r1) * -1
+		offsetComponents.hour   = Int(r2)
 		offsetComponents.minute = Int(r3)
 		offsetComponents.second = Int(r4)
 
@@ -161,4 +162,21 @@ public extension Date {
 		return Date(timeIntervalSince1970: randomTime)
 	}
 
+}
+
+class ColoredDatePicker: UIDatePicker {
+	var changed = false
+	override func addSubview(_ view: UIView) {
+		if !changed {
+			changed = true
+			self.setValue(UIColor.white, forKey: "textColor")
+		}
+		super.addSubview(view)
+	}
+}
+
+// MARK: - COLOR DEFINITION
+
+extension UIColor {
+	public class var editSwipeBackground: UIColor { return UIColor(red: 3/255, green: 177/255, blue: 0/255, alpha: 1.0) }
 }
