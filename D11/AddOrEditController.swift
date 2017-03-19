@@ -53,12 +53,12 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 	var theNotifyQuantity: Int = 0
 	var theNotifyMode: Int = 0
 	
-	let repeats: [String]               = ["never", "hour", "day", "week", "month", "quarter", "year"]
-	let repeatsPlurals: [String]        = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
+	let repeats: [String]               = ["never", "minute", "hour", "day", "week", "month", "quarter", "year"]
+	let repeatsPlurals: [String]        = ["never", "minutes", "hours", "days", "weeks", "months", "quarters", "years"]
 	let endRepatMenu: [String]          = ["never", "after"]
 
-	let notifyTypeMenu: [String]        = ["never", "hour", "day", "week", "month", "quarter", "year"]
-	let notifyTypeMenuPlurals: [String] = ["never", "hours", "days", "weeks", "months", "quarters", "years"]
+	let notifyTypeMenu: [String]        = ["never", "minute", "hour", "day", "week", "month", "quarter", "year"]
+	let notifyTypeMenuPlurals: [String] = ["never", "minutes", "hours", "days", "weeks", "months", "quarters", "years"]
 	let notifyModeMenu: [String]        = ["before", "after"]
 
 //	var activeRowInComp1: Int = 0
@@ -96,13 +96,13 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			theDate = ev.date as! Date
 
 			theRepeatType = Int(ev.repeatType)
-			theRepeatQuantity = Int(ev.repeatQuantity)
+			theRepeatQuantity = Int(ev.repeatQuantity) - 1
 
 			theEndRepeatType = Int(ev.endRepeatType)
-			theEndRepeatQuantity = Int(ev.endRepeatQuantity)
+			theEndRepeatQuantity = Int(ev.endRepeatQuantity) - 1
 
 			theNotifyType = Int(ev.notifyType)
-			theNotifyQuantity = Int(ev.notifyQuantity)
+			theNotifyQuantity = Int(ev.notifyQuantity) - 1
 			theNotifyMode = Int(ev.notifyMode)
 
 		} else {
@@ -397,34 +397,33 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		}
 	}
 
-	func notifyTextForNotifyLabel(notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> String {
+//	func notifyTextForNotifyLabel(notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> String {
+//
+//		let notifyQuantityStr = notifyType == 0 ? "" : String(notifyQuantity + 1)
+//		let notifyModeStr = notifyType == 0 ? "" : notifyModeMenu[notifyMode]
+//		let notifyTypeStr = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
+//
+//		return "\(notifyQuantityStr) \(notifyTypeStr) \(notifyModeStr)".trimmingCharacters(in: .whitespaces)
+//	}
 
-		let notifyQuantityStr = notifyType == 0 ? "" : String(notifyQuantity + 1)
-		let notifyModeStr = notifyType == 0 ? "" : notifyModeMenu[notifyMode]
+//	func endRepeatTextForEndRepeatLabel(endRepeatType: Int, endRepeatQuantity: Int) -> String {
+//
+//		let endRepeatQuantityStr = endRepeatType == 0 ? "" : String(endRepeatQuantity + 1)
+//		let endRepeatPostLabel = endRepeatQuantity > 0 ? "times" : "time"
+//		let endRepeatQuantityLabel = endRepeatType == 0 ? "" : endRepeatPostLabel
+//		let endRepeatType = endRepatMenu[endRepeatType]
+//
+//		return "\(endRepeatType) \(endRepeatQuantityStr) \(endRepeatQuantityLabel)".trimmingCharacters(in: .whitespaces)
+//	}
 
-		let notifyTypeStr = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
-
-		return "\(notifyQuantityStr) \(notifyTypeStr) \(notifyModeStr)".trimmingCharacters(in: .whitespaces)
-	}
-
-	func endRepeatTextForEndRepeatLabel(endRepeatType: Int, endRepeatQuantity: Int) -> String {
-
-		let endRepeatQuantityStr = endRepeatType == 0 ? "" : String(endRepeatQuantity + 1)
-		let endRepeatPostLabel = endRepeatQuantity > 0 ? "times" : "time"
-		let endRepeatQuantityLabel = endRepeatType == 0 ? "" : endRepeatPostLabel
-		let endRepeatType = endRepatMenu[endRepeatType]
-
-		return "\(endRepeatType) \(endRepeatQuantityStr) \(endRepeatQuantityLabel)".trimmingCharacters(in: .whitespaces)
-	}
-
-	func repeatTextForRepeatLabel(repeatType: Int, repeatQuantity: Int) -> String {
-
-		let repeatQuantityString = repeatType == 0 ? "" : String(repeatQuantity + 1)
-		let repeatTypeString = repeatQuantity == 0 ? repeats[repeatType] : repeatsPlurals[repeatType]
-		let everyString = repeatType == 0 ? "" : "every"
-
-		return "\(everyString) \(repeatQuantityString) \(repeatTypeString)".trimmingCharacters(in: .whitespaces)
-	}
+//	func repeatTextForRepeatLabel(repeatType: Int, repeatQuantity: Int) -> String {
+//
+//		let repeatQuantityString = repeatType == 0 ? "" : String(repeatQuantity + 1)
+//		let repeatTypeString = repeatQuantity == 0 ? repeats[repeatType] : repeatsPlurals[repeatType]
+//		let everyString = repeatType == 0 ? "" : "every"
+//
+//		return "\(everyString) \(repeatQuantityString) \(repeatTypeString)".trimmingCharacters(in: .whitespaces)
+//	}
 
 
 	// MARK: - Other
@@ -509,21 +508,18 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
-		debugPrint("Preparing to return from AddOrEditController to MainController")
-
 		if sender is UIBarButtonItem {
-			debugPrint("Cancel or AddOrSave button pressed")
 
 			let clickedButton     = sender as! UIBarButtonItem
 			let buttonTag         = clickedButton.tag
 
-			let repeatQuantity    = repeatPicker.selectedRow(inComponent: 0)
+			let repeatQuantity    = repeatPicker.selectedRow(inComponent: 0) + 1
 			let repeatType        = repeatPicker.selectedRow(inComponent: 1)
 			let endRepeatType     = endRepeatPicker.selectedRow(inComponent: 0)
-			let endRepeatQuantity = endRepeatPicker.selectedRow(inComponent: 1)
+			let endRepeatQuantity = endRepeatPicker.selectedRow(inComponent: 1) + 1
 			let title             = titleTextField.text!.trimmingCharacters(in: .whitespaces)
 			let notifyType        = notifyPicker.selectedRow(inComponent: 1)
-			let notifyQuantity    = notifyPicker.selectedRow(inComponent: 0)
+			let notifyQuantity    = notifyPicker.selectedRow(inComponent: 0) + 1
 			let notifyMode        = notifyPicker.selectedRow(inComponent: 2)
 			
 			var action: ActionToReturn
@@ -591,9 +587,5 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		}
 	}
 
-	// SERVE??????
-	@IBAction func unwindToAddOrEditController(unwindSegue: UIStoryboardSegue) {
-
-	}
 
 }

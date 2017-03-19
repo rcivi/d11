@@ -23,7 +23,6 @@ class EventCell: MGSwipeTableCell {
 
 
 
-
 class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	@IBOutlet var eventsTable: UITableView!
@@ -53,22 +52,32 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 //		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
 //		print("Simulator working direcotry: \(dirPaths[0])")
 
+
+
 		// Removes empty lines in the table
 		eventsTable.tableFooterView = UIView()
 
 		let appDelegate = UIApplication.shared.delegate as! AppDelegate
 		managedObjectContext = appDelegate.persistentContainer.viewContext
 
+		UNUserNotificationCenter.current().delegate = self
+		
 		self.refreshControl?.addTarget(self, action: #selector(MainController.handleRefresh) , for: UIControlEvents.valueChanged)
 
-		createInitialRecords()
+//		createInitialRecords()
+		deleteAllEvents()
 		loadPreferences()
 		loadEvents()
+		resetEventsNotifications()
     }
+
+	// ^^^^^^ END VIEWDIDLOAD ^^^^^^
+
+
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 	// MARK: - TABLE VIEW DATA SOURCE
@@ -107,10 +116,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		let (newDate, colloquial) = dateDistanceFromNow(toDate: dt1, repeatType: evr, repeatQuantity: evrQN, endRepeatType: ert, endRepeatQuantity: erq)
 
-//		let debugString = "\(tit), \(colloquial) - DB: \(dt1) - Rpt: \(newDate) - (T\(evrN),Q\(evrQN),ER\(erq)) - Now: \(today)"
-//		debugPrint(debugString)
-
-		cell.titleLabel.text = tit
+		cell.titleLabel.text = tit + (nt == 0 ? "" : "*")
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
 		cell.detail2Label.text = ""
 
@@ -128,17 +134,22 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		// configure swipe left buttons
 		// green: 03B100
-		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named:"fat-pencil-90.png"), backgroundColor: UIColor.editSwipeBackground , padding: 30, callback: {
-			(cell) -> Bool in
+		let cellButton1 = MGSwipeButton(title: "", icon: UIImage(named: "fat-pencil-90.png"), backgroundColor: UIColor.editSwipeBackground , padding: 30, callback: { (cell) -> Bool in
 
 			self.editCell(cell: cell)
 			return true
 		})
-		cell.leftButtons = [cellButton1]
+		let cellButton2 = MGSwipeButton(title: "", icon: UIImage(named: "information-symbol.png"), backgroundColor: UIColor.orange , padding: 20, callback: { (cell) -> Bool in
+
+			self.showCellInfo(cell: cell)
+			return true
+		})
+
+		cell.leftButtons = [cellButton1, cellButton2]
 		cell.leftSwipeSettings.transition = MGSwipeTransition.static
 		cell.leftExpansion.buttonIndex = 0
 		cell.leftExpansion.fillOnTrigger = true
-		cell.leftExpansion.threshold = 2
+		cell.leftExpansion.threshold = 1.3
 
 		
 		//configure swipe right buttons
@@ -152,14 +163,39 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		cell.rightSwipeSettings.transition = MGSwipeTransition.static
 		cell.rightExpansion.buttonIndex = 0
 		cell.rightExpansion.fillOnTrigger = true
-		cell.rightExpansion.threshold = 2
-
+		cell.rightExpansion.threshold = 1.3
 
 		return cell
 	}
 
 
 	// MARK: - SWIPE HELPER METHODS
+
+	func showCellInfo(cell: UITableViewCell) {
+
+		let row = (self.tableView.indexPath(for: cell)?.row)!
+		let event = events[row]
+
+		let title = event.title ?? "Title"
+		let date = dateAndTimeFormatter.string(from: event.date as! Date)
+		let rDate = dateAndTimeFormatter.string(from: event.rolledDate as! Date)
+		let rep = repeatTextForRepeatLabel(repeatType: Int(event.repeatType), repeatQuantity: Int(event.repeatQuantity) - 1)
+		let endRep = endRepeatTextForEndRepeatLabel(endRepeatType: Int(event.endRepeatType), endRepeatQuantity: Int(event.endRepeatQuantity) - 1)
+		let notify = notifyTextForNotifyLabel(notifyType: Int(event.notifyType), notifyQuantity: Int(event.notifyQuantity) - 1, notifyMode: Int(event.notifyMode))
+
+		var notDate = "none"
+		if let ndate = event.notificationDate {
+			notDate = dateAndTimeFormatter.string(from: ndate as Date)
+		}
+
+		let notId = event.notificationId ?? "none"
+
+		let body = "Date: \(date)\n" + "Repeat: \(rep)\n" + "End repeat: \(endRep)\n" + "Rolled date: \(rDate)\n" + "Notify: \(notify)\n" + "Notification date: \(notDate)\n" + "Norification id: \(notId)"
+
+		let alert = UIAlertController(title: title, message: body, preferredStyle: UIAlertControllerStyle.alert)
+		alert.addAction(UIAlertAction(title: "Done", style: UIAlertActionStyle.default, handler: nil))
+		self.present(alert, animated: true, completion: nil)
+	}
 
 	func deleteCell(cell: UITableViewCell) {
 
@@ -227,48 +263,24 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let notificationType     = Every(rawValue: notifyType)!
 		let notificationMode     = Mode(rawValue: notifyMode)!
 
+		var quantity = 1.minute
+
 		switch(notificationType) {
-
-		case Every.never:
-			break
-		case Every.hour:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - notificationQuantity.hour
-			case Mode.after: notificationDate = notificationDate + notificationQuantity.hour
-			}
-
-		case Every.day:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - notificationQuantity.day
-			case Mode.after: notificationDate = notificationDate + notificationQuantity.day
-			}
-
-		case Every.week:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - notificationQuantity.week
-			case Mode.after: notificationDate = notificationDate + notificationQuantity.week
-			}
-
-		case Every.month:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - notificationQuantity.month
-			case Mode.after: notificationDate = notificationDate + notificationQuantity.month
-			}
-
-		case Every.quarter:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - (notificationQuantity * 3).month
-			case Mode.after: notificationDate = notificationDate + (notificationQuantity * 3).month
-			}
-
-		case Every.year:
-			switch(notificationMode) {
-			case Mode.before: notificationDate = notificationDate - notificationQuantity.year
-			case Mode.after: notificationDate = notificationDate + notificationQuantity.year
-			}
-
+		case Every.never: break
+		case Every.minute: quantity  = notificationQuantity.minute
+		case Every.hour: quantity    = notificationQuantity.hour
+		case Every.day: quantity     = notificationQuantity.day
+		case Every.week: quantity    = notificationQuantity.week
+		case Every.month: quantity   = notificationQuantity.month
+		case Every.quarter: quantity = (notificationQuantity * 3).month
+		case Every.year: quantity    = notificationQuantity.year
 		}
-		
+
+		switch(notificationMode) {
+		case Mode.before: notificationDate = notificationDate - quantity
+		case Mode.after: notificationDate = notificationDate + quantity
+		}
+
 		return notificationDate
 	}
 
@@ -292,10 +304,10 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 	func rollDate(startDate: Date, repeatType: Every, repeatQuantity: Int, endRepeatType: Int, endRepeatQuantity: Int) -> Date {
 
 		var newDate    = startDate
-		let rquantity  = repeatQuantity + 1 // To change from position to value
+		let rquantity  = repeatQuantity
 		let erquantity = endRepeatType == 0 ? 0 : endRepeatQuantity
 
-		var countRepetitions = 0
+		var countRepetitions = 1
 
 		if newDate.isInPast && repeatType != Every.never {
 			while newDate.isBefore(date: Date(), granularity: .second) && countRepetitions <= erquantity {
@@ -303,21 +315,14 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 				countRepetitions += endRepeatType == 0 ? 0 : 1
 
 				switch(repeatType) {
-
-				case Every.never:
-					break
-				case Every.hour:
-					newDate = newDate + rquantity.hour
-				case Every.day:
-					newDate = newDate + rquantity.day
-				case Every.week:
-					newDate = newDate + rquantity.week
-				case Every.month:
-					newDate = newDate + rquantity.month
-				case Every.quarter:
-					newDate = newDate + (rquantity * 3).month
-				case Every.year:
-					newDate = newDate + rquantity.year
+				case Every.never: break
+				case Every.minute: newDate = newDate + rquantity.minute
+				case Every.hour: newDate = newDate + rquantity.hour
+				case Every.day: newDate = newDate + rquantity.day
+				case Every.week: newDate = newDate + rquantity.week
+				case Every.month: newDate = newDate + rquantity.month
+				case Every.quarter: newDate = newDate + (rquantity * 3).month
+				case Every.year: newDate = newDate + rquantity.year
 				}
 			}
 		}
@@ -331,12 +336,12 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		deleteAllEvents()
 
-		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
-		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 5, notifyQuantity: 2, notifyMode: 0)
+		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
+		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
 		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 4, notifyQuantity: 2, notifyMode: 0)
+		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 5, notifyQuantity: 2, notifyMode: 0)
 		let r7 = Result(action: .added, title: "Evento con titolo molto lungo", date: Date())
 
 
@@ -349,7 +354,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		saveEventWithStruct(eventToSave: nil, res: r7)
 
 		let faker = Faker()
-		for _ in 1...15 {
+		for _ in 1...1 {
 			let r = Result(action: .added, title: faker.team.name() , date: Date.random())
 			saveEventWithStruct(eventToSave: nil, res: r)
 		}
@@ -361,12 +366,16 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 	public func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
 		let event: Event = eventToSave != nil ? eventToSave! : Event(context: managedObjectContext!)
+
 		let date: Date =  res.date
 
 		event.title = res.title
 		event.date = date as NSDate
 
 		event.rolledDate = rollDate(startDate: date, repeatType: Every(rawValue: res.repeatType)!, repeatQuantity: res.repeatQuantity, endRepeatType: res.endRepeatType, endRepeatQuantity: res.endRepeatQuantity)  as NSDate?
+
+		notificationIdCounter += 1
+		UserDefaults.standard.setValue (notificationIdCounter, forKey: PrefsKey.notificationIdCounterKey.rawValue)
 
 		event.allday            = true
 		event.repeatType        = Int32(res.repeatType)
@@ -376,11 +385,18 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		event.notifyType        = Int32(res.notifyType)
 		event.notifyQuantity    = Int32(res.notifyQuantity)
 		event.notifyMode        = Int32(res.notifyMode)
+		event.notificationId    = "thedate.notification.\(notificationIdCounter)"
+		event.notificationDate  = calculateNotificationDate(event: event) as NSDate
 
 		do {
 			try managedObjectContext!.save()
 		} catch { fatalError("Error in storing data") }
 
+		// Check for User Notifications Settings
+//		let grantedNotificatiosSettings = UIApplication.shared.currentUserNotificationSettings
+//		print(grantedNotificatiosSettings ?? "No granted notification settings found")
+
+//		sendNotification(event: event)
 	}
 
 
@@ -406,15 +422,24 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 			let results = try managedObjectContext?.fetch(request)
 
 			switch sortEventsBy {
-			case .date:
-				events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
-			case .title:
-				events = (results?.sorted(by: { $0.title! < $1.title!  }))!
+			case .date: events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
+			case .title: events = (results?.sorted(by: { $0.title! < $1.title!  }))!
 			}
-
 		} catch {
 			fatalError("Error in retrieving items")
 		}
+	}
+
+	func resetEventsNotifications() {
+
+		let center = UNUserNotificationCenter.current()
+		center.removeAllDeliveredNotifications()
+		center.removeAllPendingNotificationRequests()
+
+		for event in events {
+			sendNotification(event: event)
+		}
+
 	}
 
 	func displayEvent(event: Event) {
@@ -455,18 +480,13 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		guard let res = navigationController.theResult else { return }
 		
 		switch res.action {
-
-		case .canceled:
-			break
-
-		case .added:
-			saveEventWithStruct(eventToSave: nil, res: res)
-			
-		case .edited:
-			saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
+		case .canceled: break
+		case .added: saveEventWithStruct(eventToSave: nil, res: res)
+		case .edited: saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
 		}
 
 		loadEvents()
+		resetEventsNotifications()
 		eventsTable.reloadData()
 	}
 
@@ -506,6 +526,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		let sortType = SortEventsBy(rawValue: defaults.integer(forKey: PrefsKey.sortEventsByKey.rawValue))
 		sortEventsBy = sortType ?? SortEventsBy.date
+
+		notificationIdCounter = defaults.integer(forKey: PrefsKey.notificationIdCounterKey.rawValue)
 	}
 
 	// MARK: - TABLE ANIMATION
@@ -544,7 +566,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 	func handleRefresh(refreshControl: UIRefreshControl) {
 
-		colloquialIsOn.toggle()
+//		colloquialIsOn.toggle()
 		let defaults = UserDefaults.standard
 		defaults.set(colloquialIsOn, forKey: PrefsKey.colloquialKey.rawValue)
 

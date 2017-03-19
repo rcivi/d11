@@ -8,6 +8,7 @@
 
 import UIKit
 import Fakery
+import UserNotifications
 
 class PreferencesController: UITableViewController {
 
@@ -105,13 +106,27 @@ class PreferencesController: UITableViewController {
 
 		let alert = UIAlertController()
 
-		alert.addAction(UIAlertAction(title: "Title", style: .default, handler: { (action) in
-			print("Title")
+		alert.addAction(UIAlertAction(title: "Remove all notifications", style: .default, handler: { (action) in
+			let center = UNUserNotificationCenter.current()
+			center.removeAllDeliveredNotifications()
+			center.removeAllPendingNotificationRequests()
 		}))
 
 
-		alert.addAction(UIAlertAction(title: "Date", style: .default, handler: { (action) in
-			print("Date")
+		alert.addAction(UIAlertAction(title: "List all notifications", style: .default, handler: { (action) in
+			let center = UNUserNotificationCenter.current()
+			center.getPendingNotificationRequests(completionHandler: { requests in
+				print("Pending notifications (\(requests.count))")
+				for request in requests {
+					print(request)
+				}
+			})
+			center.getDeliveredNotifications(completionHandler: { delivereds in
+				print("Delivered notifications (\(delivereds.count))")
+				for delivered in delivereds {
+					print(delivered)
+				}
+			})
 		}))
 
 		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in

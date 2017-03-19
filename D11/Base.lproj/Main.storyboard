@@ -175,9 +175,9 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dN4-N4-q3r">
-                                                    <rect key="frame" x="8" y="6" width="135" height="30"/>
+                                                    <rect key="frame" x="8" y="6" width="143" height="30"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Generate Fake Data"/>
+                                                    <state key="normal" title="Manage notifications"/>
                                                     <connections>
                                                         <action selector="generateFakeDataButtonPressed:" destination="mkd-NL-mTV" eventType="touchUpInside" id="OsH-9E-6th"/>
                                                     </connections>
@@ -204,7 +204,7 @@
                     <navigationItem key="navigationItem" title="Preferences" id="Lhi-GZ-mnM">
                         <barButtonItem key="leftBarButtonItem" image="back" id="6uK-Uc-8ZB">
                             <connections>
-                                <segue destination="leF-ZM-kxs" kind="unwind" unwindAction="unwindToMainControllerFromPreferencesWithSegue:" id="bJE-2r-jAy"/>
+                                <segue destination="leF-ZM-kxs" kind="unwind" identifier="identifier2" unwindAction="unwindToMainControllerFromPreferencesWithSegue:" id="bJE-2r-jAy"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -215,7 +215,7 @@
                         <outlet property="detailTextExampleLabel" destination="2xO-t8-5uY" id="nMA-fH-CCX"/>
                         <outlet property="titleSlider" destination="1Q1-RR-yFW" id="yRh-mV-pZc"/>
                         <outlet property="titleTextExampleLabel" destination="9gG-gn-lOR" id="Ruf-da-pJO"/>
-                        <segue destination="leF-ZM-kxs" kind="unwind" unwindAction="unwindToMainControllerFromPreferencesWithSegue:" id="SWL-gR-1ft"/>
+                        <segue destination="leF-ZM-kxs" kind="unwind" identifier="identifier1" unwindAction="unwindToMainControllerFromPreferencesWithSegue:" id="SWL-gR-1ft"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mb5-b5-rba" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -727,13 +727,13 @@
                         <barButtonItem key="leftBarButtonItem" tag="1" systemItem="cancel" id="M79-OU-bhl">
                             <connections>
                                 <action selector="cancelButtonClicked:" destination="kFN-ch-PsB" id="DVj-SY-53y"/>
-                                <segue destination="sqn-BW-jJ8" kind="unwind" unwindAction="unwindToMainControllerWithSegue:" id="TOs-fE-zHY"/>
+                                <segue destination="sqn-BW-jJ8" kind="unwind" identifier="identifier3" unwindAction="unwindToMainControllerWithSegue:" id="TOs-fE-zHY"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" tag="2" systemItem="save" id="Njo-Kb-Bu7">
                             <connections>
                                 <action selector="addOrSaveButtonClicked:" destination="kFN-ch-PsB" id="cHI-ed-AxB"/>
-                                <segue destination="sqn-BW-jJ8" kind="unwind" unwindAction="unwindToMainControllerWithSegue:" id="PDs-cb-Shc"/>
+                                <segue destination="sqn-BW-jJ8" kind="unwind" identifier="identifier4" unwindAction="unwindToMainControllerWithSegue:" id="PDs-cb-Shc"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
