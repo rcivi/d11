@@ -65,7 +65,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		self.refreshControl?.addTarget(self, action: #selector(MainController.handleRefresh) , for: UIControlEvents.valueChanged)
 
 //		createInitialRecords()
-		deleteAllEvents()
+//		deleteAllEvents()
+
 		loadPreferences()
 		loadEvents()
 		resetEventsNotifications()
@@ -336,12 +337,12 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		deleteAllEvents()
 
-		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 5, notifyQuantity: 2, notifyMode: 0)
-		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!, allday: true, repeatType: 7, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!, allday: true, repeatType: 6, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 0, notifyQuantity: 0, notifyMode: 0)
-		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!, allday: true, repeatType: 0, repeatQuantity: 0, endRepeatType: 0, endRepeatQuantity: 0, notifyType: 5, notifyQuantity: 2, notifyMode: 0)
+		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!)
+		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!)
+		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!)
+		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!)
+		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!)
+		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!)
 		let r7 = Result(action: .added, title: "Evento con titolo molto lungo", date: Date())
 
 
@@ -354,7 +355,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		saveEventWithStruct(eventToSave: nil, res: r7)
 
 		let faker = Faker()
-		for _ in 1...1 {
+		for _ in 1...3 {
 			let r = Result(action: .added, title: faker.team.name() , date: Date.random())
 			saveEventWithStruct(eventToSave: nil, res: r)
 		}
