@@ -18,7 +18,7 @@ class EventCell: MGSwipeTableCell {
 
 	@IBOutlet weak var titleLabel: UILabel!
 	@IBOutlet weak var detail1Label: UILabel!
-	@IBOutlet weak var detail2Label: UILabel!
+//	@IBOutlet weak var detail2Label: UILabel!
 }
 
 
@@ -120,7 +120,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		cell.titleLabel.text = tit + (nt == 0 ? "" : "*")
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
-		cell.detail2Label.text = ""
+//		cell.detail2Label.text = ""
 
 		let font = cell.titleLabel.font.fontName
 		let size = NSNumber(value: Double(titleFontSize))
