@@ -67,6 +67,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 //		createInitialRecords()
 //		deleteAllEvents()
 
+		initializePreferences()
 		loadPreferences()
 		loadEvents()
 		resetEventsNotifications()
@@ -308,22 +309,21 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let rquantity  = repeatQuantity
 		let erquantity = endRepeatType == 0 ? 0 : endRepeatQuantity
 
-		var countRepetitions = 1
+		var countRepetitions = endRepeatType == 0 ? 0 : 1
 
 		if newDate.isInPast && repeatType != Every.never {
+
 			while newDate.isBefore(date: Date(), granularity: .second) && countRepetitions <= erquantity {
-
 				countRepetitions += endRepeatType == 0 ? 0 : 1
-
 				switch(repeatType) {
 				case Every.never: break
-				case Every.minute: newDate = newDate + rquantity.minute
-				case Every.hour: newDate = newDate + rquantity.hour
-				case Every.day: newDate = newDate + rquantity.day
-				case Every.week: newDate = newDate + rquantity.week
-				case Every.month: newDate = newDate + rquantity.month
+				case Every.minute: newDate  = newDate + rquantity.minute
+				case Every.hour: newDate    = newDate + rquantity.hour
+				case Every.day: newDate     = newDate + rquantity.day
+				case Every.week: newDate    = newDate + rquantity.week
+				case Every.month: newDate   = newDate + rquantity.month
 				case Every.quarter: newDate = newDate + (rquantity * 3).month
-				case Every.year: newDate = newDate + rquantity.year
+				case Every.year: newDate    = newDate + rquantity.year
 				}
 			}
 		}
@@ -511,6 +511,18 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 	}
 
 	// MARK: - LOAD PREFERENCES
+
+	func initializePreferences() {
+
+		UserDefaults.standard.register(defaults: [
+			PrefsKey.colloquialKey.rawValue: true,
+			PrefsKey.animateTableIsOnKey.rawValue: true,
+			PrefsKey.titleFontSizeKey.rawValue: 20.0,
+			PrefsKey.detailFontSizeKey.rawValue: 13.0,
+			PrefsKey.sortEventsByKey.rawValue: 0,
+			PrefsKey.notificationIdCounterKey.rawValue: 1
+			])
+	}
 
 	func loadPreferences() {
 
