@@ -93,7 +93,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			titleTextField.text = ev.title!
 			allDaySwitch.setOn(ev.allday, animated: true)
 
-			theDate = ev.date as! Date
+			theDate = ev.date! as Date
 
 			theRepeatType = Int(ev.repeatType)
 			theRepeatQuantity = Int(ev.repeatQuantity) - 1
@@ -116,7 +116,7 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			titleTextField.text = ""
 			allDaySwitch.setOn(true, animated: true)
 
-			theDate = Date()
+			theDate = setAlldayEventToPrefTime(date: Date())
 			titleTextField.becomeFirstResponder()
 		}
 
@@ -136,7 +136,6 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 		notifyPicker.selectRow(theNotifyQuantity, inComponent: 0, animated: true)
 		notifyPicker.selectRow(theNotifyType, inComponent: 1, animated: true)
 		notifyPicker.selectRow(theNotifyMode, inComponent: 2, animated: true)
-
 	}
 
 	override func didReceiveMemoryWarning() {
@@ -183,6 +182,9 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 			if endRepeatPickerIsVisible { heigth = 238.0 } else { heigth = 0.0 }
 		} else if indexPath.section == 3 && indexPath.row == 1 {
 			if notifyPickerIsVisible { heigth = 238.0 } else { heigth = 0.0 }
+		} else if indexPath.section == 1 && indexPath.row == 3 {
+			// TIME ;; if allday is true is 0.0 else 44.0
+			if allDaySwitch.isOn { heigth = 0.0 } else { heigth = 44.0 }
 		} else {
 			heigth = 44.0
 		}
@@ -389,41 +391,14 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 				notifyPicker.reloadAllComponents()
 			}
 
-						let notifyType = notifyPicker.selectedRow(inComponent: 1)
-						let notifyQuantity = notifyPicker.selectedRow(inComponent: 0)
-						let notifyMode = notifyPicker.selectedRow(inComponent: 2)
+			let notifyType     = notifyPicker.selectedRow(inComponent: 1)
+			let notifyQuantity = notifyPicker.selectedRow(inComponent: 0)
+			let notifyMode     = notifyPicker.selectedRow(inComponent: 2)
 
 			notifyLabel.text = notifyTextForNotifyLabel(notifyType: notifyType, notifyQuantity: notifyQuantity, notifyMode: notifyMode)
 		}
 	}
 
-//	func notifyTextForNotifyLabel(notifyType: Int, notifyQuantity: Int, notifyMode: Int) -> String {
-//
-//		let notifyQuantityStr = notifyType == 0 ? "" : String(notifyQuantity + 1)
-//		let notifyModeStr = notifyType == 0 ? "" : notifyModeMenu[notifyMode]
-//		let notifyTypeStr = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
-//
-//		return "\(notifyQuantityStr) \(notifyTypeStr) \(notifyModeStr)".trimmingCharacters(in: .whitespaces)
-//	}
-
-//	func endRepeatTextForEndRepeatLabel(endRepeatType: Int, endRepeatQuantity: Int) -> String {
-//
-//		let endRepeatQuantityStr = endRepeatType == 0 ? "" : String(endRepeatQuantity + 1)
-//		let endRepeatPostLabel = endRepeatQuantity > 0 ? "times" : "time"
-//		let endRepeatQuantityLabel = endRepeatType == 0 ? "" : endRepeatPostLabel
-//		let endRepeatType = endRepatMenu[endRepeatType]
-//
-//		return "\(endRepeatType) \(endRepeatQuantityStr) \(endRepeatQuantityLabel)".trimmingCharacters(in: .whitespaces)
-//	}
-
-//	func repeatTextForRepeatLabel(repeatType: Int, repeatQuantity: Int) -> String {
-//
-//		let repeatQuantityString = repeatType == 0 ? "" : String(repeatQuantity + 1)
-//		let repeatTypeString = repeatQuantity == 0 ? repeats[repeatType] : repeatsPlurals[repeatType]
-//		let everyString = repeatType == 0 ? "" : "every"
-//
-//		return "\(everyString) \(repeatQuantityString) \(repeatTypeString)".trimmingCharacters(in: .whitespaces)
-//	}
 
 
 	// MARK: - Other
@@ -440,35 +415,31 @@ class AddOrEditController: UITableViewController, UIPickerViewDelegate, UIPicker
 
 	@IBAction func allDaySwitchClicked(_ sender: Any) {
 
-//		var result = ""
-//		guard let dateString = dateLabel.text else { return }
-//
-//		if allDaySwitch.isOn {
-//			if let date = dateAndTimeFormatter.date(from: dateString) {
-//				result = dateOnlyFormatter.string(from: date)
-//				datePicker.datePickerMode = .date
-//			}
-//		} else {
-//			if let date = dateOnlyFormatter.date(from: dateString) {
-//				result = dateAndTimeFormatter.string(from: date)
-//				datePicker.datePickerMode = .dateAndTime
-//			}
-//		}
-//
-//		dateLabel.text = result
+		tableView.beginUpdates()
+
+		if allDaySwitch.isOn {
+			let myDate = setAlldayEventToPrefTime(date: datePicker.date)
+			datePicker.date = myDate
+			timePicker.date = myDate
+			timeLabel.text = timeOnlyFormatter.string(from: myDate)
+
+			timePickerIsVisible = false
+			timeLabel.textColor = UIColor.white
+		}
+		
+		addOrEditTable.reloadData()
+		tableView.endUpdates()
 	}
 
 	func syncDateAndTimePickers() {
 
-		let d1                = datePicker.date
-		let d2                = timePicker.date
-
-		let year              = d1.year
-		let month             = d1.month
-		let day               = d1.day
-
-		let hour              = d2.hour
-		let minute            = d2.minute
+		let d1     = datePicker.date
+		let d2     = timePicker.date
+		let year   = d1.year
+		let month  = d1.month
+		let day    = d1.day
+		let hour   = d2.hour
+		let minute = d2.minute
 
 		let mergedDateAndTime = dateAndTimeFormatter.date(from: "\(day)-\(month)-\(year) \(hour):\(minute)")
 

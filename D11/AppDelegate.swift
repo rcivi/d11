@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let center = UNUserNotificationCenter.current()
 		center.requestAuthorization(options: [.alert, .badge, .sound], completionHandler: { granted, error in
 			if !granted {
-				print("Notification are not allowed \(error)")
+				print("Notification are not allowed \(String(describing: error))")
 			}
 		})
 

@@ -18,7 +18,6 @@ class EventCell: MGSwipeTableCell {
 
 	@IBOutlet weak var titleLabel: UILabel!
 	@IBOutlet weak var detail1Label: UILabel!
-//	@IBOutlet weak var detail2Label: UILabel!
 }
 
 
@@ -120,7 +119,6 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		cell.titleLabel.text = tit + (nt == 0 ? "" : "*")
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
-//		cell.detail2Label.text = ""
 
 		let font = cell.titleLabel.font.fontName
 		let size = NSNumber(value: Double(titleFontSize))
@@ -179,20 +177,29 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		let event = events[row]
 
 		let title = event.title ?? "Title"
-		let date = dateAndTimeFormatter.string(from: event.date as! Date)
-		let rDate = dateAndTimeFormatter.string(from: event.rolledDate as! Date)
+		let date = dateAndTimeFormatter.string(from: event.date! as Date) // !!!!!!
+		let allday = "\(event.allday)"
+		let rDate = dateAndTimeFormatter.string(from: event.rolledDate! as Date) // !!!!!
 		let rep = repeatTextForRepeatLabel(repeatType: Int(event.repeatType), repeatQuantity: Int(event.repeatQuantity) - 1)
 		let endRep = endRepeatTextForEndRepeatLabel(endRepeatType: Int(event.endRepeatType), endRepeatQuantity: Int(event.endRepeatQuantity) - 1)
 		let notify = notifyTextForNotifyLabel(notifyType: Int(event.notifyType), notifyQuantity: Int(event.notifyQuantity) - 1, notifyMode: Int(event.notifyMode))
 
 		var notDate = "none"
 		if let ndate = event.notificationDate {
-			notDate = dateAndTimeFormatter.string(from: ndate as Date)
+			if Int(event.notifyType) != 0 {
+				notDate = dateAndTimeFormatter.string(from: ndate as Date)
+			}
 		}
 
-		let notId = event.notificationId ?? "none"
+//		let notId = "Notification id: \(event.notificationId ?? "none")"
 
-		let body = "Date: \(date)\n" + "Repeat: \(rep)\n" + "End repeat: \(endRep)\n" + "Rolled date: \(rDate)\n" + "Notify: \(notify)\n" + "Notification date: \(notDate)\n" + "Norification id: \(notId)"
+		var body = "All-day event: \(allday)\n"
+		body += "Date: \(date)\n"
+		body += "Repeat: \(rep)\n"
+		body += "End repeat: \(endRep)\n"
+		body += "Rolled date: \(rDate)\n"
+		body += "Notify: \(notify)\n"
+		body += "Notification date: \(notDate)\n"
 
 		let alert = UIAlertController(title: title, message: body, preferredStyle: UIAlertControllerStyle.alert)
 		alert.addAction(UIAlertAction(title: "Done", style: UIAlertActionStyle.default, handler: nil))
@@ -367,8 +374,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 	public func saveEventWithStruct(eventToSave: Event?, res: Result) {
 
 		let event: Event = eventToSave != nil ? eventToSave! : Event(context: managedObjectContext!)
-
-		let date: Date =  res.date
+		let date: Date   = res.allday ? setAlldayEventToPrefTime(date: res.date) : res.date
 
 		event.title = res.title
 		event.date = date as NSDate
@@ -378,7 +384,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		notificationIdCounter += 1
 		UserDefaults.standard.setValue (notificationIdCounter, forKey: PrefsKey.notificationIdCounterKey.rawValue)
 
-		event.allday            = true
+		event.allday            = res.allday
 		event.repeatType        = Int32(res.repeatType)
 		event.repeatQuantity    = Int32(res.repeatQuantity)
 		event.endRepeatType     = Int32(res.endRepeatType)
@@ -423,7 +429,7 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 			let results = try managedObjectContext?.fetch(request)
 
 			switch sortEventsBy {
-			case .date: events = (results?.sorted(by: { ($0.rolledDate as! Date) < ($1.rolledDate as! Date) }))!
+			case .date: events  = (results?.sorted(by: { ($0.rolledDate! as Date) < ($1.rolledDate! as Date) }))!
 			case .title: events = (results?.sorted(by: { $0.title! < $1.title!  }))!
 			}
 		} catch {
@@ -519,8 +525,9 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 			PrefsKey.animateTableIsOnKey.rawValue: true,
 			PrefsKey.titleFontSizeKey.rawValue: 20.0,
 			PrefsKey.detailFontSizeKey.rawValue: 13.0,
-			PrefsKey.sortEventsByKey.rawValue: 0,
-			PrefsKey.notificationIdCounterKey.rawValue: 1
+			PrefsKey.sortEventsByKey.rawValue: SortEventsBy.date.rawValue,
+			PrefsKey.notificationIdCounterKey.rawValue: 1,
+			PrefsKey.alldayNotificationMinuteKey.rawValue: 9 * 60
 			])
 	}
 
@@ -537,10 +544,14 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		detailFontSize = defaults.float(forKey: PrefsKey.detailFontSizeKey.rawValue)
 		if detailFontSize == 0.0 { detailFontSize = 13.0 }
 
-		let sortType = SortEventsBy(rawValue: defaults.integer(forKey: PrefsKey.sortEventsByKey.rawValue))
-		sortEventsBy = sortType ?? SortEventsBy.date
+		if let sortType = SortEventsBy(rawValue: defaults.integer(forKey: PrefsKey.sortEventsByKey.rawValue)) {
+			sortEventsBy = sortType
+		} else {
+			sortEventsBy = SortEventsBy.date
+		}
 
 		notificationIdCounter = defaults.integer(forKey: PrefsKey.notificationIdCounterKey.rawValue)
+		alldayNotificationMinute = defaults.integer(forKey: PrefsKey.alldayNotificationMinuteKey.rawValue)
 	}
 
 	// MARK: - TABLE ANIMATION

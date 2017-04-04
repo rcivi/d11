@@ -65,7 +65,6 @@ class PreferencesController: UITableViewController {
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
-		debugPrint("Leaving Preferences")
 		savePreferences()
 	}
 

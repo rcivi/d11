@@ -73,7 +73,18 @@ struct Result {
 	var notifyMode: Int
 
 
-	init(action: ActionToReturn, title: String, date: Date, allday: Bool = true, repeatType: Int = 0, repeatQuantity: Int = 0, endRepeatType: Int = 0, endRepeatQuantity: Int = 0, notifyType: Int = 0, notifyQuantity: Int = 0, notifyMode: Int = 0) {
+	init(action: ActionToReturn,
+		title: String,
+		date: Date,
+		allday: Bool = true,
+		repeatType: Int = 0,
+		repeatQuantity: Int = 0,
+		endRepeatType: Int = 0,
+		endRepeatQuantity: Int = 0,
+		notifyType: Int = 0,
+		notifyQuantity: Int = 0,
+		notifyMode: Int = 0
+		) {
 
 		self.action            = action
 		self.title             = title
@@ -91,25 +102,27 @@ struct Result {
 
 // MARK: - PREFERENCES VARIABLES
 
-var colloquialIsOn: Bool       = false
-var normalColor: UIColor       = .white
-var attentionColor: UIColor    = .orange
-var alarmColor: UIColor        = .red
-var titleFontSize: Float       = 20
-var detailFontSize: Float      = 13
-var animateTableIsOn: Bool     = true
-var notificationIdCounter: Int = 0
+var colloquialIsOn: Bool          = false
+var normalColor: UIColor          = .white
+var attentionColor: UIColor       = .orange
+var alarmColor: UIColor           = .red
+var titleFontSize: Float          = 20
+var detailFontSize: Float         = 13
+var animateTableIsOn: Bool        = true
+var notificationIdCounter: Int    = 0
+var alldayNotificationMinute: Int = 9 * 60
 
 enum PrefsKey: String {
-	case colloquialKey            = "colloquial"
-	case normalColorKey           = "normalColor"
-	case attentioncolorKey        = "attentionColor"
-	case alertColorKey            = "alertColor"
-	case titleFontSizeKey         = "titleFontSize"
-	case detailFontSizeKey        = "detailFontSize"
-	case animateTableIsOnKey      = "animateTableIsOn"
-	case sortEventsByKey          = "sortEventsBy"
-	case notificationIdCounterKey = "notificationIdCounter"
+	case colloquialKey               = "colloquial"
+	case normalColorKey              = "normalColor"
+	case attentioncolorKey           = "attentionColor"
+	case alertColorKey               = "alertColor"
+	case titleFontSizeKey            = "titleFontSize"
+	case detailFontSizeKey           = "detailFontSize"
+	case animateTableIsOnKey         = "animateTableIsOn"
+	case sortEventsByKey             = "sortEventsBy"
+	case notificationIdCounterKey    = "notificationIdCounter"
+	case alldayNotificationMinuteKey = "alldaNotificationMinute"
 }
 
 enum SortEventsBy: Int {
@@ -190,7 +203,7 @@ extension MainController: UNUserNotificationCenterDelegate {
 
 	func calculateNotificationDate(event: Event) -> Date {
 
-		var notificationDate = event.rolledDate as! Date
+		var notificationDate = event.rolledDate! as Date
 		var quantity = 0.minute
 		let type = Every.init(rawValue: Int(event.notifyType)) ?? Every.never
 		let mode = Mode.init(rawValue: Int(event.notifyMode)) ?? Mode.before
@@ -251,24 +264,24 @@ extension MainController: UNUserNotificationCenterDelegate {
 
 func repeatTextForRepeatLabel(repeatType: Int, repeatQuantity: Int) -> String {
 
-	let repeats: [String]               = ["never", "minute", "hour", "day", "week", "month", "quarter", "year"]
-	let repeatsPlurals: [String]        = ["never", "minutes", "hours", "days", "weeks", "months", "quarters", "years"]
+	let repeats: [String]        = ["never", "minute", "hour", "day", "week", "month", "quarter", "year"]
+	let repeatsPlurals: [String] = ["never", "minutes", "hours", "days", "weeks", "months", "quarters", "years"]
 
-	let repeatQuantityString = repeatType == 0 ? "" : String(repeatQuantity + 1)
-	let repeatTypeString = repeatQuantity == 0 ? repeats[repeatType] : repeatsPlurals[repeatType]
-	let everyString = repeatType == 0 ? "" : "every"
+	let repeatQuantityString = repeatType     == 0 ? "" : String(repeatQuantity + 1)
+	let repeatTypeString     = repeatQuantity == 0 ? repeats[repeatType] : repeatsPlurals[repeatType]
+	let everyString          = repeatType     == 0 ? "" : "every"
 
 	return "\(everyString) \(repeatQuantityString) \(repeatTypeString)".trimmingCharacters(in: .whitespaces)
 }
 
 func endRepeatTextForEndRepeatLabel(endRepeatType: Int, endRepeatQuantity: Int) -> String {
 
-	let endRepatMenu: [String]          = ["never", "after"]
+	let endRepatMenu: [String] = ["never", "after"]
 
-	let endRepeatQuantityStr = endRepeatType == 0 ? "" : String(endRepeatQuantity + 1)
-	let endRepeatPostLabel = endRepeatQuantity > 0 ? "times" : "time"
-	let endRepeatQuantityLabel = endRepeatType == 0 ? "" : endRepeatPostLabel
-	let endRepeatType = endRepatMenu[endRepeatType]
+	let endRepeatQuantityStr   = endRepeatType == 0    ? "" : String(endRepeatQuantity + 1)
+	let endRepeatPostLabel     = endRepeatQuantity > 0 ? "times" : "time"
+	let endRepeatQuantityLabel = endRepeatType == 0    ? "" : endRepeatPostLabel
+	let endRepeatType          = endRepatMenu[endRepeatType]
 
 	return "\(endRepeatType) \(endRepeatQuantityStr) \(endRepeatQuantityLabel)".trimmingCharacters(in: .whitespaces)
 }
@@ -279,10 +292,25 @@ func notifyTextForNotifyLabel(notifyType: Int, notifyQuantity: Int, notifyMode: 
 	let notifyTypeMenuPlurals: [String] = ["never", "minutes", "hours", "days", "weeks", "months", "quarters", "years"]
 	let notifyModeMenu: [String]        = ["before", "after"]
 
-	let notifyQuantityStr = notifyType == 0 ? "" : String(notifyQuantity + 1)
-	let notifyModeStr = notifyType == 0 ? "" : notifyModeMenu[notifyMode]
-	let notifyTypeStr = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
+	let notifyQuantityStr = notifyType == 0    ? "" : String(notifyQuantity + 1)
+	let notifyModeStr     = notifyType == 0    ? "" : notifyModeMenu[notifyMode]
+	let notifyTypeStr     = notifyQuantity > 0 ? notifyTypeMenuPlurals[notifyType] : notifyTypeMenu[notifyType]
 
 	return "\(notifyQuantityStr) \(notifyTypeStr) \(notifyModeStr)".trimmingCharacters(in: .whitespaces)
 }
 
+
+func setAlldayEventToPrefTime(date: Date) -> Date {
+
+	let year   = date.year
+	let month  = date.month
+	let day    = date.day
+	let hour   = alldayNotificationMinute / 60
+	let minute = alldayNotificationMinute % 60
+
+	if let myDateAt9 = dateAndTimeFormatter.date(from: "\(day)-\(month)-\(year) \(hour):\(minute)") {
+		return myDateAt9
+	} else {
+		return date
+	}
+}
