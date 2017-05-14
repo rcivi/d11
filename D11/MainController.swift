@@ -8,8 +8,9 @@
 
 import UIKit
 import CoreData
-import SwiftDate
 import UserNotifications
+
+import SwiftDate
 import Fakery
 import MGSwipeTableCell
 
@@ -117,8 +118,9 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		let (newDate, colloquial) = dateDistanceFromNow(toDate: dt1, repeatType: evr, repeatQuantity: evrQN, endRepeatType: ert, endRepeatQuantity: erq)
 
-		cell.titleLabel.text = tit + (nt == 0 ? "" : "*")
+		cell.titleLabel.text = tit // + (nt == 0 ? "" : "⊙") // SIMBOLO CAMPANELLA SE NOTIFICA ATTIVA
 		cell.detail1Label.text = colloquialIsOn ? colloquial : dateAndTimeFormatter.string(from: newDate)
+		if nt != 0 { cell.detail1Label.text = "· " + (cell.detail1Label.text ?? " – ") }
 
 		let font = cell.titleLabel.font.fontName
 		let size = NSNumber(value: Double(titleFontSize))

@@ -245,6 +245,8 @@ extension MainController: UNUserNotificationCenterDelegate {
 		//			content.badge = NSNumber(integerLiteral: UIApplication.shared.applicationIconBadgeNumber + 1);
 		content.categoryIdentifier = "it.rug.localNotification"
 
+
+		// GESTIRE IL REPEAT!!!
 		let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
 		let request = UNNotificationRequest.init(identifier: event.notificationId!, content: content, trigger: trigger)
 
