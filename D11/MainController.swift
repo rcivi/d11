@@ -490,8 +490,8 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 		
 		switch res.action {
 		case .canceled: break
-		case .added: saveEventWithStruct(eventToSave: nil, res: res)
-		case .edited: saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
+		case .added:    saveEventWithStruct(eventToSave: nil, res: res)
+		case .edited:   saveEventWithStruct(eventToSave: navigationController.addOrEditEvent, res: res)
 		}
 
 		loadEvents()
