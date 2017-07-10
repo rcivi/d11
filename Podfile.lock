@@ -1,0 +1,18 @@
+PODS:
+  - Fakery (2.0.0)
+  - MGSwipeTableCell (1.5.6)
+  - SwiftDate (4.1.6)
+
+DEPENDENCIES:
+  - Fakery
+  - MGSwipeTableCell
+  - SwiftDate (~> 4.0)
+
+SPEC CHECKSUMS:
+  Fakery: 97b99c23937d2e025d9135c75e2b17351ccd5031
+  MGSwipeTableCell: 616700eb0ffd1c611ba909066cb7fd739790a0a7
+  SwiftDate: 6bae71add23ce9f16ec2be3a521b21000da5804b
+
+PODFILE CHECKSUM: 4774a520ca7318241724d50a143d2001f55fe66a
+
+COCOAPODS: 1.2.1
