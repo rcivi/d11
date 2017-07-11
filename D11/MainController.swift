@@ -346,12 +346,12 @@ class MainController: UITableViewController, MGSwipeTableCellDelegate {
 
 		deleteAllEvents()
 
-		let r1 = Result(action: .added, title: "Rug · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!)
-		let r2 = Result(action: .added, title: "Bianca · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!)
-		let r3 = Result(action: .added, title: "Clara · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!)
-		let r4 = Result(action: .added, title: "Pietro · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!)
-		let r5 = Result(action: .added, title: "EZ Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!)
-		let r6 = Result(action: .added, title: "Rug · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!)
+		let r1 = Result(action: .added, title: "Rxx · Passaporto", date: dateAndTimeFormatter.date(from: "23-6-2025 8:00")!)
+		let r2 = Result(action: .added, title: "Bkkkkk · Compleanno", date: dateAndTimeFormatter.date(from: "4-2-1996 21:30")!)
+		let r3 = Result(action: .added, title: "Cjjjj · Compleanno", date: dateAndTimeFormatter.date(from: "25-7-1962 0:00")!)
+		let r4 = Result(action: .added, title: "Pdddd · Compleanno", date: dateAndTimeFormatter.date(from: "8-1-1999 8:00")!)
+		let r5 = Result(action: .added, title: "Ek Birthday", date: dateAndTimeFormatter.date(from: "21-11-2010 8:00")!)
+		let r6 = Result(action: .added, title: "Rxx · Patente", date: dateAndTimeFormatter.date(from: "13-12-2020 9:00")!)
 		let r7 = Result(action: .added, title: "Evento con titolo molto lungo", date: Date())
 
 
